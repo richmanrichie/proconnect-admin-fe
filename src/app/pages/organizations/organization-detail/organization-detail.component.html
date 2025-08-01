@@ -1,0 +1,170 @@
+<div class="header bg-gradient-danger pb-8 pt-5 pt-md-8">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center">
+        <div class="col">
+          <h6 class="h2 text-white d-inline-block mb-0">Organization Details</h6>
+        </div>
+        <div class="col text-right">
+          <button class="btn btn-sm btn-neutral" (click)="onBack()">
+            <i class="ni ni-bold-left"></i> Back to List
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--7">
+  <div class="row">
+    <div class="col">
+      <div class="card shadow">
+        <div *ngIf="isLoading" class="text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+          <p class="mt-2 mb-0">Loading organization details...</p>
+        </div>
+
+        <div *ngIf="!isLoading && error" class="alert alert-danger mx-4 mt-4">
+          {{ error }}
+        </div>
+
+        <div *ngIf="!isLoading && organization" class="card-body">
+          <div class="row align-items-center mb-4">
+            <div class="col">
+              <h3 class="mb-0">{{ organization.name }}</h3>
+              <p class="text-muted mb-0">ID: {{ organization.organisationId }}</p>
+            </div>
+            <div class="col-auto">
+              <button class="btn btn-primary" (click)="onEdit()">
+                <i class="ni ni-ruler-pencil"></i> Edit Organization
+              </button>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-6">
+              <div class="card bg-default shadow">
+                <div class="card-header bg-transparent border-0">
+                  <h3 class="text-white mb-0">Organization Information</h3>
+                </div>
+                <div class="card-body">
+                  <div class="pl-lg-4">
+                    <div class="row mb-3">
+                      <div class="col-4">
+                        <h6 class="text-uppercase text-light ls-1 mb-1">Industry</h6>
+                        <p class="mb-0">{{ organization.industry || 'N/A' }}</p>
+                      </div>
+                      <div class="col-4">
+                        <h6 class="text-uppercase text-light ls-1 mb-1">Type</h6>
+                        <span class="badge" [ngClass]="organization.isLender ? 'badge-success' : 'badge-info'">
+                          {{ organization.isLender ? 'Lender' : 'Borrower' }}
+                        </span>
+                      </div>
+                      <div class="col-4">
+                        <h6 class="text-uppercase text-light ls-1 mb-1">CAC Number</h6>
+                        <p class="mb-0">{{ organization.cacRegNumber || 'N/A' }}</p>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-4">
+                        <h6 class="text-uppercase text-light ls-1 mb-1">Tax ID</h6>
+                        <p class="mb-0">{{ organization.taxId || 'N/A' }}</p>
+                      </div>
+                      <div class="col-8">
+                        <h6 class="text-uppercase text-light ls-1 mb-1">Email Domain</h6>
+                        <p class="mb-0">{{ organization.emailDomain || 'N/A' }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-6">
+              <div class="card bg-default shadow">
+                <div class="card-header bg-transparent border-0">
+                  <h3 class="text-white mb-0">Statistics</h3>
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="card card-stats mb-4 mb-xl-0">
+                        <div class="card-body">
+                          <div class="row">
+                            <div class="col">
+                              <h5 class="card-title text-uppercase text-muted mb-0">Staff</h5>
+                              <span class="h2 font-weight-bold mb-0">{{ organization.staffCount || 0 }}</span>
+                            </div>
+                            <div class="col-auto">
+                              <div class="icon icon-shape bg-gradient-red text-white rounded-circle shadow">
+                                <i class="ni ni-single-02"></i>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="card card-stats mb-4 mb-xl-0">
+                        <div class="card-body">
+                          <div class="row">
+                            <div class="col">
+                              <h5 class="card-title text-uppercase text-muted mb-0">Admins</h5>
+                              <span class="h2 font-weight-bold mb-0">{{ organization.adminCount || 0 }}</span>
+                            </div>
+                            <div class="col-auto">
+                              <div class="icon icon-shape bg-gradient-orange text-white rounded-circle shadow">
+                                <i class="ni ni-circle-08"></i>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row mt-4">
+            <div class="col">
+              <div class="card bg-default shadow">
+                <div class="card-header bg-transparent border-0">
+                  <h3 class="text-white mb-0">Activity</h3>
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="d-flex align-items-center">
+                        <div class="icon icon-shape icon-shape-primary rounded-circle shadow mr-3">
+                          <i class="ni ni-bell-55"></i>
+                        </div>
+                        <div>
+                          <h6 class="mb-0 text-sm">Organization Created</h6>
+                          <p class="text-muted mb-0 text-sm">{{ organization.createdAt | date:'medium' }}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="d-flex align-items-center">
+                        <div class="icon icon-shape icon-shape-warning rounded-circle shadow mr-3">
+                          <i class="ni ni-settings"></i>
+                        </div>
+                        <div>
+                          <h6 class="mb-0 text-sm">Last Updated</h6>
+                          <p class="text-muted mb-0 text-sm">{{ organization.updatedAt | date:'medium' }}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

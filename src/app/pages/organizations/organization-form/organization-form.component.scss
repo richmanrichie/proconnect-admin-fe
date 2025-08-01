@@ -1,0 +1,46 @@
+// Custom styles for organization form component
+:host {
+  display: block;
+}
+
+// Form section styling
+.section-title {
+  margin-bottom: 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #32325d;
+}
+
+// Custom checkbox styling
+.custom-control-label {
+  cursor: pointer;
+  user-select: none;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .pl-lg-4 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+}
+
+// Form validation styles
+.invalid-feedback {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: #f5365c;
+}
+
+// Loading spinner
+.spinner-border {
+  vertical-align: middle;
+}
+
+// Action buttons
+.btn-actions {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e9ecef;
+}

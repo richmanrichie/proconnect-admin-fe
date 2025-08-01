@@ -1,0 +1,55 @@
+// Loan list component styles
+.loan-table {
+  tbody tr {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.02);
+    }
+  }
+  
+  .badge {
+    font-size: 0.75rem;
+    padding: 0.35em 0.65em;
+  }
+  
+  .badge-success {
+    background-color: #2dce89;
+  }
+  
+  .badge-warning {
+    background-color: #fb6340;
+  }
+  
+  .badge-info {
+    background-color: #11cdef;
+  }
+  
+  .badge-secondary {
+    background-color: #8898aa;
+  }
+}
+
+// Loading spinner
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+  margin: 1rem 0;
+}
+
+// Empty state
+.text-muted {
+  color: #8898aa !important;
+}
+
+// Pagination
+.pagination {
+  margin-bottom: 0;
+}
+
+// Responsive table
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}

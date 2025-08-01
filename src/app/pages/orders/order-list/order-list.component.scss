@@ -1,0 +1,55 @@
+// Order list component styles
+// Using existing dashboard styles, only adding minimal custom styles if absolutely necessary
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+// Status badges
+.badge {
+  &.badge-warning {
+    background-color: #fb6340;
+  }
+  
+  &.badge-success {
+    background-color: #2dce89;
+  }
+  
+  &.badge-danger {
+    background-color: #f5365c;
+  }
+  
+  &.badge-info {
+    background-color: #11cdef;
+  }
+}
+
+// Table styles
+.table {
+  thead th {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+  }
+  
+  td, th {
+    vertical-align: middle;
+  }
+}
+
+// Loading spinner
+.spinner-border {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-width: 0.2em;
+}

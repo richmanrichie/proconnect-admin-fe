@@ -1,0 +1,301 @@
+<div class="header bg-gradient-danger pb-8 pt-5 pt-md-8">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center">
+        <div class="col">
+          <h6 class="h2 text-white d-inline-block mb-0">Loan Details #{{ loan?.id }}</h6>
+        </div>
+        <div class="col text-right">
+          <button class="btn btn-sm btn-neutral" (click)="goBack()">
+            <i class="ni ni-bold-left"></i> Back to List
+          </button>
+          <button *ngIf="loan?.status === 'APPROVED_BY_LENDER'" 
+                  class="btn btn-sm btn-success ml-2" 
+                  (click)="makePayment()">
+            <i class="ni ni-money-coins mr-1"></i> Make Payment
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--7">
+  <div class="row">
+    <div class="col">
+      <div class="card shadow">
+        <div class="card-header">
+          <div class="row align-items-center">
+            <div class="col">
+              <h3 class="mb-0">Loan Information</h3>
+            </div>
+            <div class="col text-right">
+              <span class="badge" [ngClass]="getStatusBadgeClass(loan?.status || '')">
+                {{ loan?.status | titlecase }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div *ngIf="isLoading" class="text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+          <p class="mt-2 mb-0">Loading loan details...</p>
+        </div>
+
+        <!-- Error State -->
+        <div *ngIf="!isLoading && errorMessage" class="alert alert-danger m-4">
+          {{ errorMessage }}
+        </div>
+
+        <!-- Loan Details -->
+        <div *ngIf="!isLoading && !errorMessage && loan" class="card-body">
+          <ul class="nav nav-tabs" id="loanTabs" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link" [class.active]="activeTab === 'details'" 
+                 (click)="activeTab = 'details'"
+                 style="cursor: pointer;">
+                <i class="ni ni-single-copy-04 mr-2"></i>Loan Details
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" [class.active]="activeTab === 'schedule'" 
+                 (click)="activeTab = 'schedule'"
+                 style="cursor: pointer;">
+                <i class="ni ni-calendar-grid-58 mr-2"></i>Payment Schedule
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" [class.active]="activeTab === 'customer'" 
+                 (click)="activeTab = 'customer'"
+                 style="cursor: pointer;">
+                <i class="ni ni-single-02 mr-2"></i>Customer Info
+              </a>
+            </li>
+          </ul>
+
+          <div class="mt-4">
+            <!-- Loan Details Tab -->
+            <div *ngIf="activeTab === 'details'">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="card bg-secondary shadow">
+                    <div class="card-body">
+                      <h6 class="heading-small text-muted mb-4">Loan Information</h6>
+                      <div class="pl-lg-4">
+                        <div class="row">
+                          <div class="col-lg-6">
+                            <div class="form-group">
+                              <label class="form-control-label" for="input-amount">Loan Amount</label>
+                              <div class="form-control-plaintext">{{ formatCurrency(loan.amount) }}</div>
+                            </div>
+                          </div>
+                          <div class="col-lg-6">
+                            <div class="form-group">
+                              <label class="form-control-label" for="input-interest">Interest Rate</label>
+                              <div class="form-control-plaintext">{{ loan.interestRate }}%</div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-lg-6">
+                            <div class="form-group">
+                              <label class="form-control-label" for="input-term">Loan Term</label>
+                              <div class="form-control-plaintext">{{ loan.durationMonths }} months</div>
+                            </div>
+                          </div>
+                          <div class="col-lg-6">
+                            <div class="form-group">
+                              <label class="form-control-label" for="input-type">Loan Type</label>
+                              <div class="form-control-plaintext">{{ loan.type | titlecase }}</div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-lg-6">
+                            <div class="form-group">
+                              <label class="form-control-label" for="input-created">Created</label>
+                              <div class="form-control-plaintext">{{ loan.createdAt | date: 'medium' }}</div>
+                            </div>
+                          </div>
+                          <div class="col-lg-6">
+                            <div class="form-group">
+                              <label class="form-control-label" for="input-status">Status</label>
+                              <div class="form-control-plaintext">
+                                <span class="badge" [ngClass]="getStatusBadgeClass(loan.status)">
+                                  {{ loan.status | titlecase }}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card bg-secondary shadow">
+                    <div class="card-body">
+                      <h6 class="heading-small text-muted mb-4">Summary</h6>
+                      <div class="pl-lg-4">
+                        <div class="d-flex justify-content-between mb-3">
+                          <span>Principal Amount:</span>
+                          <strong>{{ formatCurrency(loan.amount) }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                          <span>Total Interest:</span>
+                          <strong>{{ formatCurrency(loan.amount * (loan.interestRate / 100)) }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                          <span>Total Repayment:</span>
+                          <strong>{{ formatCurrency(loan.amount * (1 + loan.interestRate / 100)) }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                          <span>Monthly Payment:</span>
+                          <strong>{{ formatCurrency((loan.amount * (1 + loan.interestRate / 100)) / loan.durationMonths) }}</strong>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Payment Schedule Tab -->
+            <div *ngIf="activeTab === 'schedule'" class="table-responsive">
+              <table class="table align-items-center table-flush">
+                <thead class="thead-light">
+                  <tr>
+                    <th>#</th>
+                    <th>Due Date</th>
+                    <th>Principal</th>
+                    <th>Interest</th>
+                    <th>Total Payment</th>
+                    <th>Balance</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of loan.schedules; let i = index">
+                    <td>{{ i + 1 }}</td>
+                    <td>--</td>
+                    <td>{{ formatCurrency(item.principal) }}</td>
+                    <td>{{ formatCurrency(item.interest) }}</td>
+                    <td>{{ formatCurrency(item.totalPayment) }}</td>
+                    <td>{{ formatCurrency(item.balance) }}</td>
+                    <td>
+                      <span class="badge badge-warning">Pending</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Customer Info Tab -->
+            <div *ngIf="activeTab === 'customer' && loan.staff" class="row">
+              <div class="col-md-6">
+                <div class="card bg-secondary shadow">
+                  <div class="card-body">
+                    <h6 class="heading-small text-muted mb-4">Customer Information</h6>
+                    <div class="pl-lg-4">
+                      <div class="row">
+                        <div class="col-lg-12">
+                          <div class="form-group">
+                            <label class="form-control-label">Full Name</label>
+                            <div class="form-control-plaintext">
+                              {{ loan.staff.firstName }} {{ loan.staff.lastName }}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-lg-6">
+                          <div class="form-group">
+                            <label class="form-control-label">Email</label>
+                            <div class="form-control-plaintext">{{ loan.staff.email }}</div>
+                          </div>
+                        </div>
+                        <div class="col-lg-6">
+                          <div class="form-group">
+                            <label class="form-control-label">Phone</label>
+                            <div class="form-control-plaintext">
+                              {{ loan.staff.phoneNumber }}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-lg-6">
+                          <div class="form-group">
+                            <label class="form-control-label">ID Type</label>
+                            <div class="form-control-plaintext">{{ loan.staff.idType }}</div>
+                          </div>
+                        </div>
+                        <div class="col-lg-6">
+                          <div class="form-group">
+                            <label class="form-control-label">ID Number</label>
+                            <div class="form-control-plaintext">{{ loan.staff.idNumber }}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="card bg-secondary shadow">
+                  <div class="card-body">
+                    <h6 class="heading-small text-muted mb-4">Address</h6>
+                    <div class="pl-lg-4" *ngIf="loan.staff.address && loan.staff.address.length > 0">
+                      <div class="row">
+                        <div class="col-lg-12">
+                          <div class="form-group">
+                            <label class="form-control-label">Street</label>
+                            <div class="form-control-plaintext">{{ loan.staff.address[0].street }}</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-lg-6">
+                          <div class="form-group">
+                            <label class="form-control-label">City</label>
+                            <div class="form-control-plaintext">{{ loan.staff.address[0].city }}</div>
+                          </div>
+                        </div>
+                        <div class="col-lg-6">
+                          <div class="form-group">
+                            <label class="form-control-label">State</label>
+                            <div class="form-control-plaintext">{{ loan.staff.address[0].state }}</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-lg-6">
+                          <div class="form-group">
+                            <label class="form-control-label">Country</label>
+                            <div class="form-control-plaintext">{{ loan.staff.address[0].country }}</div>
+                          </div>
+                        </div>
+                        <div class="col-lg-6">
+                          <div class="form-group">
+                            <label class="form-control-label">Postal Code</label>
+                            <div class="form-control-plaintext">{{ loan.staff.address[0].zipCode }}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div *ngIf="!loan.staff.address || loan.staff.address.length === 0" class="text-center py-4">
+                      <p class="text-muted">No address information available</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

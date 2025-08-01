@@ -1,0 +1,240 @@
+<div class="header bg-gradient-danger pb-8 pt-5 pt-md-8">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center">
+        <div class="col">
+          <h6 class="h2 text-white d-inline-block mb-0">Order Details</h6>
+        </div>
+        <div class="col text-right">
+          <button class="btn btn-sm btn-neutral" (click)="backToList()">
+            <i class="ni ni-bold-left"></i> Back to Orders
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--7">
+  <div class="row">
+    <div class="col">
+      <div class="card shadow">
+        <div *ngIf="isLoading" class="text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+          <p class="mt-2 mb-0">Loading order details...</p>
+        </div>
+
+        <div *ngIf="!isLoading && errorMessage" class="alert alert-danger mx-4 mt-4">
+          {{ errorMessage }}
+        </div>
+
+        <div *ngIf="!isLoading && order" class="card-body">
+          <div class="row mb-4">
+            <div class="col">
+              <h3 class="mb-0">Order #{{ order.orderNumber }}</h3>
+              <p class="text-muted mb-0">Placed on {{ order.createdAt | date:'medium' }}</p>
+            </div>
+            <div class="col-auto">
+              <span class="badge" [ngClass]="getStatusBadgeClass(order.status)">
+                {{ order.status }}
+              </span>
+            </div>
+          </div>
+          
+          <!-- Customer Information -->
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <div class="card bg-default shadow">
+                <div class="card-header bg-transparent border-0">
+                  <h4 class="text-white mb-0">Customer Information</h4>
+                </div>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <h5 class="text-white mb-1">{{ order.staff.firstName }} {{ order.staff.lastName }}</h5>
+                    <p class="text-muted mb-1">{{ order.staff.email }}</p>
+                    <p class="text-muted mb-0">
+                      {{ order.staff.phoneNumber }} ({{ order.staff.countryCallingCode }})
+                    </p>
+                  </div>
+                  
+                  <div *ngIf="order.staff.address && order.staff.address.length > 0" class="mt-4">
+                    <h6 class="text-uppercase text-muted mb-2">Delivery Address</h6>
+                    <address class="text-white">
+                      {{ order.staff.address[0].street }}<br>
+                      {{ order.staff.address[0].city }}, {{ order.staff.address[0].state }}<br>
+                      {{ order.staff.address[0].zipCode }}<br>
+                      {{ order.staff.address[0].country }}
+                    </address>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="card bg-default shadow">
+                <div class="card-header bg-transparent border-0">
+                  <h4 class="text-white mb-0">Order Summary</h4>
+                </div>
+                <div class="card-body">
+                  <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted">Subtotal</span>
+                    <span>{{ order.totalPrice | currency:'NGN':'symbol-narrow':'1.2-2' }}</span>
+                  </div>
+                  <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted">Items</span>
+                    <span>{{ order.items?.length || 0 }}</span>
+                  </div>
+                  <hr class="my-4">
+                  <div class="d-flex justify-content-between mb-3">
+                    <span class="font-weight-bold">Total</span>
+                    <span class="font-weight-bold">{{ order.totalPrice | currency:'NGN':'symbol-narrow':'1.2-2' }}</span>
+                  </div>
+
+                  <div *ngIf="order.status === 'PENDING'" class="mt-4">
+                    <button 
+                      class="btn btn-success btn-block mb-3"
+                      (click)="approveOrder()"
+                      [disabled]="isProcessing"
+                    >
+                      <i class="ni ni-check-bold"></i> Approve Order
+                    </button>
+                    <button 
+                      class="btn btn-danger btn-block"
+                      (click)="rejectOrder()"
+                      [disabled]="isProcessing"
+                    >
+                      <i class="ni ni-fat-remove"></i> Reject Order
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Order Items -->
+          <div class="row">
+            <div class="col-12">
+              <div class="card bg-default shadow">
+                <div class="card-header bg-transparent border-0">
+                  <h4 class="text-white mb-0">Order Items</h4>
+                </div>
+                <div class="table-responsive">
+                  <table class="table align-items-center table-dark table-flush">
+                    <thead class="thead-dark">
+                      <tr>
+                        <th scope="col">Product</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of order.items || []">
+                        <th scope="row">
+                          <div class="media align-items-center">
+                            <a href="#" class="avatar rounded-circle mr-3">
+                              <img [alt]="item.productTitle" [src]="item.imageUrl" onError="this.src='assets/img/theme/no-image.png'">
+                            </a>
+                            <div class="media-body">
+                              <span class="mb-0 text-sm">{{ item.productTitle }}</span>
+                            </div>
+                          </div>
+                        </th>
+                        <td>
+                          {{ item.price | currency:'NGN':'symbol-narrow':'1.2-2' }}
+                        </td>
+                        <td>
+                          {{ item.quantity }}
+                        </td>
+                        <td>
+                          {{ (item.price * item.quantity) | currency:'NGN':'symbol-narrow':'1.2-2' }}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Loan Details -->
+          <div class="row mt-4" *ngIf="order.loan">
+            <div class="col-12">
+              <div class="card bg-default shadow">
+                <div class="card-header bg-transparent border-0">
+                  <h4 class="text-white mb-0">Loan Details</h4>
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="text-center">
+                        <h5 class="text-muted mb-0">Loan Amount</h5>
+                        <h3 class="text-white">{{ order.loan.loanAmount | currency:'NGN':'symbol-narrow':'1.2-2' }}</h3>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="text-center">
+                        <h5 class="text-muted mb-0">Interest Rate</h5>
+                        <h3 class="text-white">{{ order.loan.interestRate }}%</h3>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="text-center">
+                        <h5 class="text-muted mb-0">Tenure</h5>
+                        <h3 class="text-white">{{ order.loan.tenureMonths }} Months</h3>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Loan Calculation -->
+                  <div class="row mt-4">
+                    <div class="col-12">
+                      <div class="table-responsive">
+                        <table class="table table-dark">
+                          <thead>
+                            <tr>
+                              <th>Description</th>
+                              <th class="text-right">Amount</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>Principal Amount</td>
+                              <td class="text-right">{{ order.loan.loanAmount | currency:'NGN':'symbol-narrow':'1.2-2' }}</td>
+                            </tr>
+                            <tr>
+                              <td>Interest ({{ order.loan.interestRate }}% for {{ order.loan.tenureMonths }} months)</td>
+                              <td class="text-right">
+                                {{ (order.loan.loanAmount * (order.loan.interestRate / 100) * (order.loan.tenureMonths / 12)) | number:'1.2-2' }}
+                              </td>
+                            </tr>
+                            <tr>
+                              <td><strong>Total Repayment</strong></td>
+                              <td class="text-right">
+                                <strong>
+                                  {{ (order.loan.loanAmount + (order.loan.loanAmount * (order.loan.interestRate / 100) * (order.loan.tenureMonths / 12))) | currency:'NGN':'symbol-narrow':'1.2-2' }}
+                                </strong>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>Monthly Payment</td>
+                              <td class="text-right">
+                                {{ ((order.loan.loanAmount + (order.loan.loanAmount * (order.loan.interestRate / 100) * (order.loan.tenureMonths / 12))) / order.loan.tenureMonths) | currency:'NGN':'symbol-narrow':'1.2-2' }}
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

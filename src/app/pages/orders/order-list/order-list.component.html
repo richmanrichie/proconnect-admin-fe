@@ -1,0 +1,121 @@
+<div class="header bg-gradient-danger pb-8 pt-5 pt-md-8">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center">
+        <div class="col">
+          <h6 class="h2 text-white d-inline-block mb-0">Orders</h6>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--7">
+  <div class="row">
+    <div class="col">
+      <div class="card shadow">
+        <div class="card-header border-0">
+          <div class="row align-items-center">
+            <div class="col">
+              <h3 class="mb-0">All Orders</h3>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="isLoading" class="text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+          <p class="mt-2 mb-0">Loading orders...</p>
+        </div>
+
+        <div *ngIf="!isLoading && errorMessage" class="alert alert-danger mx-4 mt-4">
+          {{ errorMessage }}
+        </div>
+
+        <div *ngIf="!isLoading && !errorMessage" class="table-responsive">
+          <table class="table align-items-center table-flush">
+            <thead class="thead-light">
+              <tr>
+                <th scope="col">Order #</th>
+                <th scope="col">Product</th>
+                <th scope="col">Customer</th>
+                <th scope="col">Total</th>
+                <th scope="col">Status</th>
+                <th scope="col">Date</th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let order of paginatedOrders">
+                <th scope="row">
+                  {{ order.orderNumber }}
+                </th>
+                <td>
+                  <div class="media align-items-center">
+                    <a href="#" class="avatar rounded-circle mr-3">
+                      <!-- <img alt="Product" [src]="order.imageUrl" onError="this.src='assets/img/theme/no-image.png'"> -->
+                    </a>
+                    <div class="media-body">
+                      <span class="mb-0 text-sm">{{ order.orderName }}</span>
+                      <span *ngIf="order.itemsCount > 1" class="text-muted">+{{ order.itemsCount - 1 }} more</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  {{ order.staffName }}
+                </td>
+                <td>
+                  {{ order.totalPrice | currency:'NGN':'symbol-narrow':'1.2-2' }}
+                </td>
+                <td>
+                  <span class="badge" [ngClass]="getStatusBadgeClass(order.status)">
+                    {{ order.status }}
+                  </span>
+                </td>
+                <td>
+                  {{ order.createdAt | date:'mediumDate' }}
+                </td>
+                <td class="text-right">
+                  <div ngbDropdown placement="bottom-right" class="d-inline-block">
+                    <a class="btn btn-sm btn-icon-only text-light" role="button" ngbDropdownToggle>
+                      <i class="fas fa-ellipsis-v"></i>
+                    </a>
+                    <div ngbDropdownMenu class="dropdown-menu dropdown-menu-right">
+                      <button class="dropdown-item" (click)="viewOrderDetails(order.orderNumber)">
+                        <i class="ni ni-zoom-split-in text-primary"></i> View Details
+                      </button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div *ngIf="!isLoading && orders.length > 0" class="card-footer py-4">
+          <nav aria-label="...">
+            <ngb-pagination
+              [collectionSize]="collectionSize"
+              [(page)]="page"
+              [pageSize]="pageSize"
+              [maxSize]="5"
+              [rotate]="true"
+              [ellipses]="false"
+              [boundaryLinks]="true"
+              class="justify-content-center"
+            ></ngb-pagination>
+          </nav>
+        </div>
+
+        <div *ngIf="!isLoading && orders.length === 0" class="text-center py-5">
+          <div class="text-muted">
+            <i class="ni ni-basket text-4x"></i>
+            <h3 class="mt-3">No orders found</h3>
+            <p class="mb-0">There are no orders to display at the moment.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

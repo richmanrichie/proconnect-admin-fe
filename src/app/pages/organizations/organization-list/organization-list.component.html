@@ -1,0 +1,163 @@
+<div class="header bg-primary pb-8 pt-5 pt-md-8">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center">
+        <div class="col">
+          <h6 class="h2 text-white d-inline-block mb-0">Organizations</h6>
+        </div>
+        <div class="col text-right">
+          <button class="btn btn-sm btn-neutral" (click)="onCreate()">
+            <i class="ni ni-fat-add"></i> Add Organization
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--7">
+  <div class="row">
+    <div class="col">
+      <div class="card shadow">
+        <div class="card-header border-0">
+          <h3 class="mb-0">Organizations</h3>
+        </div>
+        
+        <div *ngIf="isLoading" class="text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+          <p class="mt-2 mb-0">Loading organizations...</p>
+        </div>
+
+        <div *ngIf="!isLoading && error" class="alert alert-danger mx-4 mt-4">
+          {{ error }}
+        </div>
+
+        <div *ngIf="!isLoading && !error" class="table-responsive">
+          <table class="table align-items-center table-flush">
+            <thead class="thead-light">
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Organization ID</th>
+                <th scope="col">Industry</th>
+                <th scope="col">Type</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let org of organizations">
+                <th scope="row">
+                  <div class="media align-items-center">
+                    <div class="media-body">
+                      <span class="mb-0 text-sm">{{ org.name }}</span>
+                    </div>
+                  </div>
+                </th>
+                <td>
+                  {{ org.organisationId }}
+                </td>
+                <td>
+                  <span class="badge badge-dot mr-4">
+                    <i class="bg-warning"></i> {{ org.industry }}
+                  </span>
+                </td>
+                <td>
+                  <span class="badge" [ngClass]="org.isLender ? 'badge-success' : 'badge-info'">
+                    {{ org.isLender ? 'Lender' : 'Borrower' }}
+                  </span>
+                </td>
+                <td class="text-right">
+                  <div ngbDropdown placement="bottom-right" class="d-inline-block">
+                    <button class="btn btn-sm btn-icon-only text-light" ngbDropdownToggle>
+                      <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    <div ngbDropdownMenu class="dropdown-menu-right">
+                      <button ngbDropdownItem (click)="onView(org)">
+                        <i class="ni ni-zoom-split-in text-info mr-2"></i>View
+                      </button>
+                      <button ngbDropdownItem (click)="onEdit(org)">
+                        <i class="ni ni-ruler-pencil text-primary mr-2"></i>Edit
+                      </button>
+                      <div class="dropdown-divider"></div>
+                      <button ngbDropdownItem class="text-danger" (click)="onDelete(org, deleteModal)">
+                        <i class="ni ni-fat-remove text-danger mr-2"></i>Delete
+                      </button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="organizations.length === 0">
+                <td colspan="5" class="text-center py-4">
+                  No organizations found. Click "Add Organization" to create one.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="card-footer py-3" *ngIf="!isLoading && organizations.length > 0">
+          <div class="row align-items-center">
+            <div class="col-md-6">
+              <div class="d-flex align-items-center">
+                <span class="text-muted mr-2">Show</span>
+                <select class="form-control form-control-sm w-auto" 
+                        [(ngModel)]="pageSize" 
+                        (change)="onPageSizeChange()">
+                  <option [value]="5">5</option>
+                  <option [value]="10">10</option>
+                  <option [value]="25">25</option>
+                  <option [value]="50">50</option>
+                </select>
+                <span class="text-muted ml-2">entries</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <ngb-pagination 
+                [collectionSize]="totalElements"
+                [(page)]="page"
+                [pageSize]="pageSize"
+                (pageChange)="onPageChange($event)"
+                [maxSize]="5"
+                [rotate]="true"
+                [ellipses]="true"
+                [boundaryLinks]="true"
+                class="justify-content-end mb-0"
+                aria-label="Organization pagination">
+                <ng-template ngbPaginationFirst>First</ng-template>
+                <ng-template ngbPaginationLast>Last</ng-template>
+                <ng-template ngbPaginationPrevious>Prev</ng-template>
+                <ng-template ngbPaginationNext>Next</ng-template>
+                <ng-template ngbPaginationNumber let-page>{{ page }}</ng-template>
+              </ngb-pagination>
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col-md-12 text-center text-muted">
+              Showing {{ (page * pageSize) + 1 }} to 
+              {{ Math.min((page + 1) * pageSize, totalElements) }}
+              of {{ totalElements }} entries
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<ng-template #deleteModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title" id="modal-title">Delete Organization</h5>
+    <button type="button" class="close" (click)="modal.dismiss('cancel')" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>Are you sure you want to delete this organization? This action cannot be undone.</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss('cancel')">Cancel</button>
+    <button type="button" class="btn btn-danger" (click)="modal.close('delete')">Delete</button>
+  </div>
+</ng-template>

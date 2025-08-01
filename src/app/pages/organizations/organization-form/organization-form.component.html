@@ -1,0 +1,261 @@
+<div class="header bg-gradient-danger pb-8 pt-5 pt-md-8">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center">
+        <div class="col">
+          <h6 class="h2 text-white d-inline-block mb-0">
+            {{ isEditMode ? 'Edit' : 'Create' }} Organization
+          </h6>
+        </div>
+        <div class="col text-right">
+          <button class="btn btn-sm btn-neutral" [routerLink]="['/organizations']">
+            <i class="ni ni-bold-left"></i> Back to List
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--7">
+  <div class="row">
+    <div class="col">
+      <div class="card shadow">
+        <div class="card-header border-0">
+          <h3 class="mb-0">Organization Details</h3>
+        </div>
+        
+        <div class="card-body">
+          <form [formGroup]="organizationForm" (ngSubmit)="onSubmit()">
+            <div class="alert alert-danger" *ngIf="error">
+              {{ error }}
+            </div>
+
+            <h6 class="heading-small text-muted mb-4">Basic Information</h6>
+            <div class="pl-lg-4">
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="name">Organization Name *</label>
+                    <input 
+                      type="text" 
+                      id="name" 
+                      class="form-control" 
+                      formControlName="name"
+                      [ngClass]="{ 'is-invalid': f['name'].touched && f['name'].errors }">
+                    <div *ngIf="f['name'].touched && f['name'].errors" class="invalid-feedback">
+                      <div *ngIf="f['name'].errors['required']">Name is required</div>
+                      <div *ngIf="f['name'].errors['maxlength']">Name is too long</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="organisationId">Organization ID *</label>
+                    <input 
+                      type="text" 
+                      id="organisationId" 
+                      class="form-control" 
+                      formControlName="organisationId"
+                      [ngClass]="{ 'is-invalid': f['organisationId'].touched && f['organisationId'].errors }">
+                    <div *ngIf="f['organisationId'].touched && f['organisationId'].errors" class="invalid-feedback">
+                      <div *ngIf="f['organisationId'].errors['required']">Organization ID is required</div>
+                      <div *ngIf="f['organisationId'].errors['maxlength']">Organization ID is too long</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="industry">Industry *</label>
+                    <select 
+                      id="industry" 
+                      class="form-control" 
+                      formControlName="industry"
+                      [ngClass]="{ 'is-invalid': f['industry'].touched && f['industry'].errors }">
+                      <option value="" disabled>Select Industry</option>
+                      <option *ngFor="let industry of industries" [value]="industry">
+                        {{ industry }}
+                      </option>
+                    </select>
+                    <div *ngIf="f['industry'].touched && f['industry'].errors" class="invalid-feedback">
+                      Industry is required
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="logoUrl">Logo URL</label>
+                    <input 
+                      type="url" 
+                      id="logoUrl" 
+                      class="form-control" 
+                      formControlName="logoUrl"
+                      [ngClass]="{ 'is-invalid': f['logoUrl'].touched && f['logoUrl'].errors }">
+                    <div *ngIf="f['logoUrl'].touched && f['logoUrl'].errors" class="invalid-feedback">
+                      Please enter a valid URL
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <hr class="my-4">
+            <h6 class="heading-small text-muted mb-4">Contact Information</h6>
+            <div class="pl-lg-4">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <label class="form-control-label" for="address">Address</label>
+                    <input 
+                      type="text" 
+                      id="address" 
+                      class="form-control" 
+                      formControlName="address"
+                      [ngClass]="{ 'is-invalid': f['address'].touched && f['address'].errors }">
+                    <div *ngIf="f['address'].touched && f['address'].errors" class="invalid-feedback">
+                      <div *ngIf="f['address'].errors['maxlength']">Address is too long</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label class="form-control-label" for="primaryEmail">Primary Email *</label>
+                    <input 
+                      type="email" 
+                      id="primaryEmail" 
+                      class="form-control" 
+                      formControlName="primaryEmail"
+                      [ngClass]="{ 'is-invalid': f['primaryEmail'].touched && f['primaryEmail'].errors }">
+                    <div *ngIf="f['primaryEmail'].touched && f['primaryEmail'].errors" class="invalid-feedback">
+                      <div *ngIf="f['primaryEmail'].errors['required']">Primary email is required</div>
+                      <div *ngIf="f['primaryEmail'].errors['email']">Please enter a valid email</div>
+                      <div *ngIf="f['primaryEmail'].errors['maxlength']">Email is too long</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label class="form-control-label" for="secondEmail">Secondary Email</label>
+                    <input 
+                      type="email" 
+                      id="secondEmail" 
+                      class="form-control" 
+                      formControlName="secondEmail"
+                      [ngClass]="{ 'is-invalid': f['secondEmail'].touched && f['secondEmail'].errors }">
+                    <div *ngIf="f['secondEmail'].touched && f['secondEmail'].errors" class="invalid-feedback">
+                      <div *ngIf="f['secondEmail'].errors['email']">Please enter a valid email</div>
+                      <div *ngIf="f['secondEmail'].errors['maxlength']">Email is too long</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label class="form-control-label" for="thirdEmail">Tertiary Email</label>
+                    <input 
+                      type="email" 
+                      id="thirdEmail" 
+                      class="form-control" 
+                      formControlName="thirdEmail"
+                      [ngClass]="{ 'is-invalid': f['thirdEmail'].touched && f['thirdEmail'].errors }">
+                    <div *ngIf="f['thirdEmail'].touched && f['thirdEmail'].errors" class="invalid-feedback">
+                      <div *ngIf="f['thirdEmail'].errors['email']">Please enter a valid email</div>
+                      <div *ngIf="f['thirdEmail'].errors['maxlength']">Email is too long</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <hr class="my-4">
+            <h6 class="heading-small text-muted mb-4">Legal Information</h6>
+            <div class="pl-lg-4">
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="cacRegNumber">CAC Registration Number</label>
+                    <input 
+                      type="text" 
+                      id="cacRegNumber" 
+                      class="form-control" 
+                      formControlName="cacRegNumber"
+                      [ngClass]="{ 'is-invalid': f['cacRegNumber'].touched && f['cacRegNumber'].errors }">
+                    <div *ngIf="f['cacRegNumber'].touched && f['cacRegNumber'].errors" class="invalid-feedback">
+                      <div *ngIf="f['cacRegNumber'].errors['maxlength']">CAC number is too long</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="taxId">Tax ID</label>
+                    <input 
+                      type="text" 
+                      id="taxId" 
+                      class="form-control" 
+                      formControlName="taxId"
+                      [ngClass]="{ 'is-invalid': f['taxId'].touched && f['taxId'].errors }">
+                    <div *ngIf="f['taxId'].touched && f['taxId'].errors" class="invalid-feedback">
+                      <div *ngIf="f['taxId'].errors['maxlength']">Tax ID is too long</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="emailDomain">Email Domain</label>
+                    <div class="input-group">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">&#64;</span>
+                      </div>
+                      <input 
+                        type="text" 
+                        id="emailDomain" 
+                        class="form-control" 
+                        formControlName="emailDomain"
+                        placeholder="example.com"
+                        [ngClass]="{ 'is-invalid': f['emailDomain'].touched && f['emailDomain'].errors }">
+                    </div>
+                    <div *ngIf="f['emailDomain'].touched && f['emailDomain'].errors" class="invalid-feedback d-block">
+                      <div *ngIf="f['emailDomain'].errors['invalidDomain']">Do not include @ symbol</div>
+                      <div *ngIf="f['emailDomain'].errors['maxlength']">Domain is too long</div>
+                      <div *ngIf="f['emailDomain'].errors['pattern']">Invalid domain format</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label class="form-control-label">Organization Type</label>
+                    <div class="custom-control custom-checkbox">
+                      <input 
+                        type="checkbox" 
+                        class="custom-control-input" 
+                        id="isLender"
+                        formControlName="isLender">
+                      <label class="custom-control-label" for="isLender">
+                        This is a lending organization
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="text-center mt-5">
+              <button type="button" class="btn btn-secondary mr-3" (click)="onCancel()">
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary" [disabled]="organizationForm.invalid || isLoading">
+                <span *ngIf="isLoading" class="spinner-border spinner-border-sm mr-1"></span>
+                {{ isEditMode ? 'Update' : 'Create' }} Organization
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
