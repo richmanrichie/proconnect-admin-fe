@@ -77,9 +77,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
   private getIconClassFromPath(iconPath: string): string {
     // Map icon paths to existing icon classes
     if (iconPath.includes('Home')) return 'ni-tv-2 text-primary';
-    if (iconPath.includes('orders')) return 'ni-basket text-orange';
-    if (iconPath.includes('loan')) return 'ni-money-coins text-green';
+    if (iconPath.includes('orders')) return 'ni-basket text-primary';
+    if (iconPath.includes('loan')) return 'ni-money-coins ttext-primary';
     // Default icon if no match
-    return 'ni-app text-info';
+    return 'ni-app text-primary';
   }
 }
