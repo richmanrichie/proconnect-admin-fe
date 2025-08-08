@@ -1,0 +1,176 @@
+<div class="card bg-secondary shadow">
+  <div class="card-header bg-white border-0">
+    <div class="row align-items-center">
+      <div class="col-8">
+        <h3 class="mb-0">Company Information</h3>
+      </div>
+      <div class="col-4 text-right">
+        <button type="button" class="btn btn-sm btn-primary" (click)="onSubmit()" [disabled]="isLoading || companyForm.invalid">
+          <span *ngIf="isLoading" class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span>
+          Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <form [formGroup]="companyForm" (ngSubmit)="onSubmit()">
+      <h6 class="heading-small text-muted mb-4">Company information</h6>
+      <div class="pl-lg-4">
+        <div class="row">
+          <div class="col-lg-6">
+            <div class="form-group">
+              <label class="form-control-label" for="companyName">Company Name *</label>
+              <input 
+                type="text" 
+                id="companyName"
+                class="form-control form-control-alternative" 
+                formControlName="companyName" 
+                placeholder="Company name">
+              <small class="text-danger" *ngIf="companyForm.get('companyName')?.touched && companyForm.get('companyName')?.errors">
+                {{ getErrorMessage('companyName') }}
+              </small>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="form-group">
+              <label class="form-control-label" for="registrationNumber">Registration Number</label>
+              <input 
+                type="text" 
+                id="registrationNumber"
+                class="form-control form-control-alternative" 
+                formControlName="registrationNumber" 
+                placeholder="Registration number">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-6">
+            <div class="form-group">
+              <label class="form-control-label" for="taxId">Tax ID</label>
+              <input 
+                type="text" 
+                id="taxId"
+                class="form-control form-control-alternative" 
+                formControlName="taxId" 
+                placeholder="Tax identification number">
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="form-group">
+              <label class="form-control-label" for="email">Email address *</label>
+              <input 
+                type="email" 
+                id="email"
+                class="form-control form-control-alternative" 
+                formControlName="email" 
+                placeholder="company@example.com">
+              <small class="text-danger" *ngIf="companyForm.get('email')?.touched && companyForm.get('email')?.errors">
+                {{ getErrorMessage('email') }}
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr class="my-4">
+      <!-- Address -->
+      <h6 class="heading-small text-muted mb-4">Contact information</h6>
+      <div class="pl-lg-4">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="form-group">
+              <label class="form-control-label" for="address">Address</label>
+              <input 
+                type="text" 
+                id="address"
+                class="form-control form-control-alternative" 
+                formControlName="address" 
+                placeholder="Home Address">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-4">
+            <div class="form-group">
+              <label class="form-control-label" for="city">City</label>
+              <input 
+                type="text" 
+                id="city"
+                class="form-control form-control-alternative" 
+                formControlName="city" 
+                placeholder="City">
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="form-group">
+              <label class="form-control-label" for="state">State</label>
+              <select 
+                id="state"
+                class="form-control form-control-alternative" 
+                formControlName="state">
+                <option value="" disabled>Select state</option>
+                <option *ngFor="let state of states" [value]="state">{{ state }}</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="form-group">
+              <label class="form-control-label" for="postalCode">Postal code</label>
+              <input 
+                type="text" 
+                id="postalCode"
+                class="form-control form-control-alternative" 
+                formControlName="postalCode" 
+                placeholder="Postal code">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-6">
+            <div class="form-group">
+              <label class="form-control-label" for="country">Country</label>
+              <select 
+                id="country"
+                class="form-control form-control-alternative" 
+                formControlName="country">
+                <option *ngFor="let country of countries" [value]="country">{{ country }}</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="form-group">
+              <label class="form-control-label" for="phone">Phone number *</label>
+              <input 
+                type="tel" 
+                id="phone"
+                class="form-control form-control-alternative" 
+                formControlName="phone" 
+                placeholder="Phone number">
+              <small class="text-danger" *ngIf="companyForm.get('phone')?.touched && companyForm.get('phone')?.errors">
+                {{ getErrorMessage('phone') }}
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr class="my-4">
+      <!-- Description -->
+      <h6 class="heading-small text-muted mb-4">About company</h6>
+      <div class="pl-lg-4">
+        <div class="form-group">
+          <label class="form-control-label">About Company</label>
+          <textarea 
+            rows="4" 
+            class="form-control form-control-alternative" 
+            formControlName="description" 
+            placeholder="A few words about your company..."></textarea>
+          <small class="text-muted float-right">
+            {{ companyForm.get('description')?.value?.length || 0 }}/500 characters
+          </small>
+          <small class="text-danger d-block" *ngIf="companyForm.get('description')?.touched && companyForm.get('description')?.errors">
+            {{ getErrorMessage('description') }}
+          </small>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

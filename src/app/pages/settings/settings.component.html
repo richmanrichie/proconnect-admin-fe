@@ -1,0 +1,189 @@
+<div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 400px; background-size: cover; background-position: center top;">
+  <!-- Mask -->
+  <span class="mask bg-gradient-primary opacity-8"></span>
+  <!-- Header container -->
+  <div class="container-fluid d-flex align-items-center">
+    <div class="row">
+      <div class="col-lg-7 col-md-10">
+        <h1 class="display-2 text-white">Settings</h1>
+        <p class="text-white mt-0 mb-5">Manage your organization's settings, security, and loan configurations</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--7">
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow">
+        <div class="card-header bg-transparent">
+          <h3 class="mb-0">Settings</h3>
+        </div>
+        <div class="card-body">
+          <mat-tab-group (selectedTabChange)="onTabChanged($event)" [selectedIndex]="selectedTabIndex" class="settings-tabs">
+            <!-- Company Profile Tab -->
+            <mat-tab label="Company Profile">
+              <div class="mt-4">
+                <!-- Loading State -->
+                <div *ngIf="isLoading" class="text-center py-5">
+                  <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">Loading...</span>
+                  </div>
+                  <p class="mt-2">Loading profile data...</p>
+                </div>
+
+                <!-- Content -->
+                <div *ngIf="!isLoading">
+
+                <!-- User Information -->
+                <div class="card mb-4">
+                  <div class="card-header">
+                    <h5 class="mb-0">User Information</h5>
+                  </div>
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label class="form-control-label">Full Name</label>
+                          <p class="form-control-static">{{ user?.name || 'N/A' }}</p>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label class="form-control-label">Email Address</label>
+                          <p class="form-control-static">{{ user?.email || 'N/A' }}</p>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label class="form-control-label">Role</label>
+                          <p class="form-control-static">
+                            <span class="badge badge-primary">
+                              {{ user?.role?.replace('_', ' ') || 'N/A' }}
+                            </span>
+                          </p>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label class="form-control-label">Status</label>
+                          <p class="form-control-static">
+                            <span class="badge" [ngClass]="user?.isFirstLogin ? 'badge-warning' : 'badge-success'">
+                              {{ user?.isFirstLogin ? 'First Login' : 'Active' }}
+                            </span>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Organization Information -->
+                <div class="card">
+                  <div class="card-header">
+                    <h5 class="mb-0">Organization Information</h5>
+                  </div>
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label class="form-control-label">Organization Name</label>
+                          <p class="form-control-static">{{ organisation?.name || 'N/A' }}</p>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label class="form-control-label">Organization ID</label>
+                          <p class="form-control-static">{{ organisation?.organisationId || 'N/A' }}</p>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label class="form-control-label">CAC Registration Number</label>
+                          <p class="form-control-static">{{ organisation?.cacRegNumber || 'N/A' }}</p>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label class="form-control-label">Industry</label>
+                          <p class="form-control-static">{{ organisation?.industry ? getIndustryDisplayName(organisation.industry) : 'N/A' }}</p>
+                        </div>
+                      </div>
+                      <div class="col-12">
+                        <div class="form-group">
+                          <label class="form-control-label">Address</label>
+                          <p class="form-control-static">{{ organisation?.address || 'N/A' }}</p>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label class="form-control-label">Tax ID</label>
+                          <p class="form-control-static">{{ organisation?.taxId || 'N/A' }}</p>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label class="form-control-label">Email Domain</label>
+                          <p class="form-control-static">{{ organisation?.emailDomain || 'N/A' }}</p>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="form-control-label">Staff Count</label>
+                          <p class="form-control-static">{{ organisation?.staffCount || '0' }}</p>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="form-control-label">Admin Count</label>
+                          <p class="form-control-static">{{ organisation?.adminCount || '0' }}</p>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="form-control-label">Lender Status</label>
+                          <p class="form-control-static">
+                            <span class="badge" [ngClass]="organisation?.isLender ? 'badge-success' : 'badge-secondary'">
+                              {{ organisation?.isLender ? 'Active Lender' : 'Not a Lender' }}
+                            </span>
+                          </p>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label class="form-control-label">Created On</label>
+                          <p class="form-control-static">{{ organisation?.createdAt ? formatDate(organisation.createdAt) : 'N/A' }}</p>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label class="form-control-label">Last Updated</label>
+                          <p class="form-control-static">{{ organisation?.updatedAt ? formatDate(organisation.updatedAt) : 'N/A' }}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                </div>
+              </div>
+            </mat-tab>
+            
+            <!-- Security Tab -->
+            <mat-tab label="Security">
+              <div class="mt-4">
+                <app-security></app-security>
+              </div>
+            </mat-tab>
+            
+            <!-- Loan Settings Tab -->
+            <mat-tab label="Loan Settings">
+              <div class="tab-content mt-4">
+                <app-loan-settings></app-loan-settings>
+              </div>
+            </mat-tab>
+          </mat-tab-group>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,5 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
-/* You can add global styles to this file, and also import other style files */
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
 @font-face {
     font-family: 'Averta';
     src: url('./assets/fonts/Averta-Regular.ttf') format('truetype');
@@ -26,4 +26,22 @@
   .h1, .h2, .h3, .h4, .h5, .h6 {
     font-family: 'Averta', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     font-weight: 600;
+  }
+
+  // Material Overlay Container
+  .cdk-overlay-container {
+    position: fixed;
+    z-index: 1000;
+    pointer-events: none;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+  }
+  
+  .cdk-overlay-pane {
+    position: absolute;
+    pointer-events: auto;
+    box-sizing: border-box;
+    z-index: 1000;
   }

@@ -23,6 +23,11 @@ export const AdminLayoutRoutes: Routes = [
         .then(m => m.OrdersModule)
     },
     {
+      path: 'settings',
+      loadChildren: () => import('../../pages/settings/settings.module')
+        .then(m => m.SettingsModule)
+    },
+    {
       path: 'loans',
       loadChildren: () => import('../../pages/loans/loans.module')
         .then(m => m.LoansModule)

@@ -1,0 +1,125 @@
+<div class="card bg-secondary shadow">
+  <div class="card-header bg-white border-0">
+    <div class="row align-items-center">
+      <div class="col-8">
+        <h3 class="mb-0">Change Password</h3>
+      </div>
+      <div class="col-4 text-right">
+        <button type="button" class="btn btn-sm btn-primary" (click)="onSubmit()" [disabled]="isLoading || passwordForm.invalid">
+          <span *ngIf="isLoading" class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span>
+          Update Password
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <form [formGroup]="passwordForm" (ngSubmit)="onSubmit()">
+      <h6 class="heading-small text-muted mb-4">Password information</h6>
+      <div class="pl-lg-4">
+        <!-- Current Password -->
+        <div class="form-group">
+          <label class="form-control-label" for="currentPassword">Current Password</label>
+          <div class="input-group input-group-alternative">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
+            </div>
+            <input 
+              [type]="hideCurrentPassword ? 'password' : 'text'" 
+              id="currentPassword"
+              class="form-control" 
+              formControlName="currentPassword" 
+              placeholder="Enter current password">
+            <div class="input-group-append">
+              <button 
+                class="btn btn-outline-secondary" 
+                type="button" 
+                (click)="togglePasswordVisibility('currentPassword')">
+                <i class="ni" [class.ni-eye]="hideCurrentPassword" [class.ni-folder-17]="!hideCurrentPassword"></i>
+              </button>
+            </div>
+          </div>
+          <div *ngIf="passwordForm.get('currentPassword')?.touched && passwordForm.get('currentPassword')?.errors" class="text-danger small">
+            {{ getPasswordError('currentPassword') }}
+          </div>
+        </div>
+
+        <!-- New Password -->
+        <div class="form-group">
+          <label class="form-control-label" for="newPassword">New Password</label>
+          <div class="input-group input-group-alternative">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
+            </div>
+            <input 
+              [type]="hideNewPassword ? 'password' : 'text'" 
+              id="newPassword"
+              class="form-control" 
+              formControlName="newPassword" 
+              placeholder="Enter new password">
+            <div class="input-group-append">
+              <button 
+                class="btn btn-outline-secondary" 
+                type="button" 
+                (click)="togglePasswordVisibility('newPassword')">
+                <i class="ni" [class.ni-eye]="hideNewPassword" [class.ni-folder-17]="!hideNewPassword"></i>
+              </button>
+            </div>
+          </div>
+          <div *ngIf="passwordForm.get('newPassword')?.touched && passwordForm.get('newPassword')?.errors" class="text-danger small">
+            {{ getPasswordError('newPassword') }}
+          </div>
+          <small class="form-text text-muted">
+            Password must be at least 6 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.
+          </small>
+        </div>
+
+        <!-- Confirm New Password -->
+        <div class="form-group">
+          <label class="form-control-label" for="confirmPassword">Confirm New Password</label>
+          <div class="input-group input-group-alternative">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
+            </div>
+            <input 
+              [type]="hideConfirmPassword ? 'password' : 'text'" 
+              id="confirmPassword"
+              class="form-control" 
+              formControlName="confirmPassword" 
+              placeholder="Confirm new password">
+            <div class="input-group-append">
+              <button 
+                class="btn btn-outline-secondary" 
+                type="button" 
+                (click)="togglePasswordVisibility('confirmPassword')">
+                <i class="ni" [class.ni-eye]="hideConfirmPassword" [class.ni-folder-17]="!hideConfirmPassword"></i>
+              </button>
+            </div>
+          </div>
+          <div *ngIf="passwordForm.get('confirmPassword')?.touched && passwordForm.get('confirmPassword')?.errors" class="text-danger small">
+            {{ getPasswordError('confirmPassword') }}
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Confirmation Modal -->
+<ng-template #confirmModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Confirm Password Change</h5>
+    <button type="button" class="close" (click)="onCancelChangePassword()" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>Are you sure you want to change your password?</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="onCancelChangePassword()">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="onConfirmChangePassword()">
+      <span *ngIf="isLoading" class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span>
+      Change Password
+    </button>
+  </div>
+</ng-template>
