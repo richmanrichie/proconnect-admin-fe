@@ -8,8 +8,8 @@ declare const window: any;
   providedIn: 'root'
 })
 export class PaymentService {
-  private readonly MERCHANT_CODE =  'MX19329';
-  private readonly PAY_ITEM_ID = 'Default_Payable_MX19329';
+  private readonly MERCHANT_CODE =  'MX249412';
+  private readonly PAY_ITEM_ID = 'Default_Payable_MX249412';
   private readonly CURRENCY_CODE = 566; // NGN
 
   constructor(private sanitizer: DomSanitizer) {}
@@ -37,7 +37,7 @@ export class PaymentService {
         merchant_code: this.MERCHANT_CODE,
         pay_item_id: this.PAY_ITEM_ID,
         txn_ref: params.reference,
-        amount: (params.amount * 100).toString(), // Convert to kobo
+        amount: (100 * 100).toString(), // Convert to kobo
         currency: this.CURRENCY_CODE,
         customer_email: params.customerEmail,
         customer_name: params.customerName,

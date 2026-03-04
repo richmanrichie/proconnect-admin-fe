@@ -31,5 +31,10 @@ export const AdminLayoutRoutes: Routes = [
       path: 'loans',
       loadChildren: () => import('../../pages/loans/loans.module')
         .then(m => m.LoansModule)
+    },
+    {
+      path: 'staff',
+      loadChildren: () => import('../../pages/staff/staff.module')
+        .then(m => m.StaffModule)
     }
 ];

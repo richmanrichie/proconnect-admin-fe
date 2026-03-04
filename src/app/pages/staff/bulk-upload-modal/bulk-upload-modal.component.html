@@ -1,0 +1,48 @@
+<div class="modal-header">
+  <h5 class="modal-title">Bulk Upload Staff</h5>
+  <button type="button" class="close" (click)="activeModal.dismiss('cancel')" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<div class="modal-body">
+  <div class="alert alert-info">
+    <p class="mb-1">
+      Please use the provided template for bulk staff upload.
+    </p>
+    <a href="/assets/templates/staff-bulk-upload-sample.xlsx" download>
+      Download Sample File
+    </a>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <div class="form-group">
+    <label for="bulkFile">Upload File (.csv, .xlsx)</label>
+    <input
+      id="bulkFile"
+      type="file"
+      class="form-control-file"
+      (change)="onFileChange($event)"
+      accept=".csv,.xls,.xlsx">
+  </div>
+
+  <div *ngIf="uploadMessage" class="alert alert-success">
+    {{ uploadMessage }}
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="activeModal.dismiss('cancel')">Cancel</button>
+  <button
+    type="button"
+    class="btn btn-primary"
+    [disabled]="loading"
+    (click)="onUpload()">
+    <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
+    Upload
+  </button>
+</div>
+

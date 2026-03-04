@@ -10,6 +10,7 @@ import { catchError, map, tap } from 'rxjs/operators';
 })
 export class AuthService {
   private readonly SESSION_KEY = 'auth_token';
+  private readonly FIRST_LOGIN_KEY = 'auth_first_login';
 
   private readonly API_URL = `${environment.apiBaseUrl}/admins`;
 
@@ -36,7 +37,27 @@ export class AuthService {
   // Remove token and redirect to login
   logout(): void {
     sessionStorage.removeItem(this.SESSION_KEY);
+    sessionStorage.removeItem(this.FIRST_LOGIN_KEY);
     this.router.navigate(['/login']);
+  }
+
+  // Mark current session as first-login
+  setFirstLoginFlag(isFirstLogin: boolean): void {
+    if (isFirstLogin) {
+      sessionStorage.setItem(this.FIRST_LOGIN_KEY, 'true');
+    } else {
+      sessionStorage.removeItem(this.FIRST_LOGIN_KEY);
+    }
+  }
+
+  // Check if current session is first-login
+  isFirstLogin(): boolean {
+    return sessionStorage.getItem(this.FIRST_LOGIN_KEY) === 'true';
+  }
+
+  // Clear first-login flag (after password change)
+  clearFirstLoginFlag(): void {
+    sessionStorage.removeItem(this.FIRST_LOGIN_KEY);
   }
 
   /**
@@ -45,12 +66,13 @@ export class AuthService {
    * @returns Observable with login result
    */
   login(credentials: {email: string, password: string}): Observable<boolean> {
-    return this.http.post<{message: string, token: string, isFirstLogin: boolean}>
+    return this.http.post<{message: string, token: string, isFirstLogin?: boolean}>
       (`${this.API_URL}/login`, credentials)
       .pipe(
         tap(response => {
           if (response && response.token) {
             this.setToken(response.token);
+            this.setFirstLoginFlag(!!response.isFirstLogin);
           }
         }),
         map(response => !!response.token),

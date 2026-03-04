@@ -4,6 +4,7 @@ import { AdminService } from '../../services/admin.service';
 import { MenuItem } from '../../models/admin.model';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { AuthService } from '../../services/auth.service';
 
 export interface RouteInfo {
   path: string;
@@ -32,7 +33,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   constructor(
     private router: Router,
-    private adminService: AdminService
+    private adminService: AdminService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -81,5 +83,12 @@ export class SidebarComponent implements OnInit, OnDestroy {
     if (iconPath.includes('loan')) return 'ni-money-coins ttext-primary';
     // Default icon if no match
     return 'ni-app text-primary';
+  }
+
+  /**
+   * Logout the current user
+   */
+  logout(): void {
+    this.authService.logout();
   }
 }

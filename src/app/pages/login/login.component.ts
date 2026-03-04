@@ -58,7 +58,12 @@ export class LoginComponent implements OnInit {
     }).subscribe({
       next: (success) => {
         if (success) {
-          this.router.navigate([this.returnUrl]);
+          // If this is the first login, force password change
+          if (this.authService.isFirstLogin()) {
+            this.router.navigate(['/auth/change-password']);
+          } else {
+            this.router.navigate([this.returnUrl]);
+          }
         } else {
           this.error = 'Invalid email or password';
           this.loading = false;

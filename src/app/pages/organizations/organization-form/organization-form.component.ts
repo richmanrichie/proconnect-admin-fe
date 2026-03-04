@@ -98,10 +98,22 @@ export class OrganizationFormComponent implements OnInit {
         this.router.navigate(['/organizations']);
       },
       error: (error) => {
-        this.error = this.isEditMode 
-          ? 'Failed to update organization. Please try again.' 
-          : 'Failed to create organization. Please try again.';
         this.isLoading = false;
+
+        // Prefer backend-provided validation/message (e.g. 400 payload)
+        const backendMessage =
+          error?.error?.error ||
+          error?.error?.message ||
+          error?.message;
+
+        if (backendMessage) {
+          this.error = backendMessage;
+        } else {
+          this.error = this.isEditMode
+            ? 'Failed to update organization. Please try again.'
+            : 'Failed to create organization. Please try again.';
+        }
+
         console.error('Error saving organization:', error);
       }
     });

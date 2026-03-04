@@ -1,0 +1,125 @@
+<div class="modal-header">
+  <h5 class="modal-title">Add Staff</h5>
+  <button type="button" class="close" (click)="activeModal.dismiss('cancel')" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<div class="modal-body">
+  <div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="firstName">First Name</label>
+        <input
+          id="firstName"
+          type="text"
+          class="form-control"
+          formControlName="firstName"
+          [ngClass]="{ 'is-invalid': submitted && f['firstName'].errors }">
+        <div *ngIf="submitted && f['firstName'].errors" class="invalid-feedback">
+          First name is required
+        </div>
+      </div>
+      <div class="form-group col-md-6">
+        <label for="lastName">Last Name</label>
+        <input
+          id="lastName"
+          type="text"
+          class="form-control"
+          formControlName="lastName"
+          [ngClass]="{ 'is-invalid': submitted && f['lastName'].errors }">
+        <div *ngIf="submitted && f['lastName'].errors" class="invalid-feedback">
+          Last name is required
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          class="form-control"
+          formControlName="email"
+          [ngClass]="{ 'is-invalid': submitted && f['email'].errors }">
+        <div *ngIf="submitted && f['email'].errors" class="invalid-feedback">
+          <div *ngIf="f['email'].errors['required']">Email is required</div>
+          <div *ngIf="f['email'].errors['email']">Email is invalid</div>
+        </div>
+      </div>
+      <div class="form-group col-md-6">
+        <label for="phoneNumber">Phone Number</label>
+        <input
+          id="phoneNumber"
+          type="text"
+          class="form-control"
+          formControlName="phoneNumber"
+          [ngClass]="{ 'is-invalid': submitted && f['phoneNumber'].errors }">
+        <div *ngIf="submitted && f['phoneNumber'].errors" class="invalid-feedback">
+          Phone number is required
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="idNumber">ID Number</label>
+        <input
+          id="idNumber"
+          type="text"
+          class="form-control"
+          formControlName="idNumber"
+          [ngClass]="{ 'is-invalid': submitted && f['idNumber'].errors }">
+        <div *ngIf="submitted && f['idNumber'].errors" class="invalid-feedback">
+          ID number is required
+        </div>
+      </div>
+      <div class="form-group col-md-6">
+        <label for="idType">ID Type</label>
+        <select
+          id="idType"
+          class="form-control"
+          formControlName="idType"
+          [ngClass]="{ 'is-invalid': submitted && f['idType'].errors }">
+          <option *ngFor="let type of idTypes" [value]="type">
+            {{ type | titlecase }}
+          </option>
+        </select>
+        <div *ngIf="submitted && f['idType'].errors" class="invalid-feedback">
+          ID type is required
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="organisationId">Organisation ID</label>
+      <input
+        id="organisationId"
+        type="text"
+        class="form-control"
+        formControlName="organisationId"
+        [ngClass]="{ 'is-invalid': submitted && f['organisationId'].errors }">
+      <div *ngIf="submitted && f['organisationId'].errors" class="invalid-feedback">
+        Organisation ID is required
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="activeModal.dismiss('cancel')">Cancel</button>
+  <button
+    type="button"
+    class="btn btn-primary"
+    [disabled]="form.invalid || loading"
+    (click)="onSubmit()">
+    <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
+    Save
+  </button>
+</div>
+
