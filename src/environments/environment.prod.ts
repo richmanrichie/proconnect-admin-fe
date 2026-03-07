@@ -4,8 +4,8 @@ export const environment = {
   merchantCode: 'MX007', // Replace with production merchant code
   payItemId: '101007', // Replace with production pay item ID
   payment: {
-    scriptUrl: 'https://newwebpay.interswitchng.com/inline-checkout.js',
+    scriptUrl: 'https://newwebpay.qa.interswitchng.com/inline-checkout.js',
     currency: 566, // NGN
-    mode: 'LIVE'
+    mode: 'TEST'
   }
-};
+}

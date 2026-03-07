@@ -1,0 +1,7 @@
+{
+  "buildCommand": "node set-env.js && npm run build",
+  "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
