@@ -52,6 +52,10 @@ export class LoanService {
   processPayment(loanId: number, amount: number): Observable<any> {
     return this.http.post(`${this.apiUrl}/${loanId}/pay`, { amount });
   }
+
+  confirmOrderPayment(orderNumber: string, transactionRef: string): Observable<any> {
+    return this.http.post(`${environment.apiBaseUrl}/orders/payment`, { orderNumber, transactionRef });
+  }
 }
 
 // Add this import at the top of the file if not already present

@@ -1,3 +1,43 @@
+<!-- Payment Processing Overlay -->
+<div *ngIf="isProcessingPayment" class="payment-processing-overlay">
+  <div class="payment-processing-content">
+    <div class="spinner-border text-white mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
+    <h4 class="text-white mb-1">Confirming Payment</h4>
+    <p class="text-white mb-0 opacity-8">Please wait, do not close this page...</p>
+  </div>
+</div>
+
+<!-- Payment Result Modal -->
+<ng-template #paymentResultModal let-modal>
+  <div class="modal-body text-center p-5">
+    <div *ngIf="paymentSuccess">
+      <div class="icon icon-shape icon-lg bg-success text-white rounded-circle shadow mb-4 mx-auto">
+        <i class="ni ni-check-bold" style="font-size: 1.5rem;"></i>
+      </div>
+      <h3 class="text-success mb-2">Payment Successful</h3>
+      <p class="text-muted mb-4">{{ paymentResultMessage }}</p>
+      <div class="alert alert-success text-left py-3 px-4 mb-4" *ngIf="loan?.order">
+        <div class="d-flex justify-content-between mb-1">
+          <span class="text-muted small">Order Number</span>
+          <strong class="small">{{ loan.order.orderNumber }}</strong>
+        </div>
+        <div class="d-flex justify-content-between mb-1">
+          <span class="text-muted small">Amount</span>
+          <strong class="small">{{ formatCurrency(loan.amount) }}</strong>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="!paymentSuccess">
+      <div class="icon icon-shape icon-lg bg-warning text-white rounded-circle shadow mb-4 mx-auto">
+        <i class="ni ni-bell-55" style="font-size: 1.5rem;"></i>
+      </div>
+      <h3 class="text-warning mb-2">Confirmation Pending</h3>
+      <p class="text-muted mb-4">{{ paymentResultMessage }}</p>
+    </div>
+    <button class="btn btn-primary px-5" (click)="modal.close()">Done</button>
+  </div>
+</ng-template>
+
 <div class="header bg-primary pb-8 pt-5 pt-md-8">
   <div class="container-fluid">
     <div class="header-body">

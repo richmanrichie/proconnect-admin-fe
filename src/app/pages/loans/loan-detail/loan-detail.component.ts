@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Loan, LoanSchedule } from '../../../models/loan.model';
 import { LoanService } from '../../../services/loan.service';
 import { PaymentService } from '../../../services/payment.service';
 import { ToastrService } from 'ngx-toastr';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-loan-detail',
@@ -11,17 +12,23 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['./loan-detail.component.scss']
 })
 export class LoanDetailComponent implements OnInit {
+  @ViewChild('paymentResultModal') paymentResultModal: TemplateRef<any>;
+
   loan: Loan | null = null;
   isLoading = false;
+  isProcessingPayment = false;
   errorMessage = '';
   activeTab = 'details';
+  paymentSuccess = false;
+  paymentResultMessage = '';
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private loanService: LoanService,
     private paymentService: PaymentService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private modalService: NgbModal
   ) {}
 
   ngOnInit(): void {
@@ -106,12 +113,25 @@ export class LoanDetailComponent implements OnInit {
       onComplete: (response) => {
         console.log('Payment response:', response);
         if (response && response.txnref) {
-          // Payment was successful
-          this.toastr.success('Payment processed successfully!');
-          // Optionally refresh loan details to show updated status
-          this.loadLoanDetails();
+          this.isProcessingPayment = true;
+          const orderNumber = this.loan.order?.orderNumber?.toString() || '';
+          const transactionRef = response.txnref;
+          this.loanService.confirmOrderPayment(orderNumber, transactionRef).subscribe({
+            next: (res) => {
+              this.isProcessingPayment = false;
+              this.paymentSuccess = true;
+              this.paymentResultMessage = res.message || 'Payment confirmed successfully';
+              this.modalService.open(this.paymentResultModal, { centered: true, backdrop: 'static' });
+              this.loadLoanDetails();
+            },
+            error: (err) => {
+              this.isProcessingPayment = false;
+              this.paymentSuccess = false;
+              this.paymentResultMessage = err?.error?.message || 'Payment was received but confirmation failed. Please contact support.';
+              this.modalService.open(this.paymentResultModal, { centered: true, backdrop: 'static' });
+            }
+          });
         } else {
-          // Payment failed or was cancelled
           this.toastr.error('Payment was not completed. Please try again.');
         }
       },
