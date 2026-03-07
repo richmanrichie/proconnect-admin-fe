@@ -3,17 +3,16 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false,
-  apiBaseUrl: '/api/v1',
-  merchantCode: 'MX007',
-  payItemId: '101007',
+  production: true,
+  apiBaseUrl: 'https://proconnect-lingering-rain-3381.fly.dev/api/v1',
+  merchantCode: 'MX007', // Replace with production merchant code
+  payItemId: '101007', // Replace with production pay item ID
   payment: {
     scriptUrl: 'https://newwebpay.qa.interswitchng.com/inline-checkout.js',
     currency: 566, // NGN
     mode: 'TEST'
   }
-};
-
+}
 /*
  * For easier debugging in development mode, you can import the following file
  * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
