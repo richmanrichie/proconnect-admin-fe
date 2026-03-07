@@ -12,6 +12,8 @@ export class OrganizationDetailComponent implements OnInit {
   organization: Organization | null = null;
   isLoading = true;
   error = '';
+  successMessage = '';
+  isMakingLender = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -54,5 +56,38 @@ export class OrganizationDetailComponent implements OnInit {
 
   onBack(): void {
     this.router.navigate(['/organizations']);
+  }
+
+  onMakeLender(): void {
+    if (!this.organization || this.isMakingLender) {
+      return;
+    }
+
+    this.isMakingLender = true;
+    this.error = '';
+    this.successMessage = '';
+
+    this.organizationService.makeOrganizationLender({
+      organisationId: this.organization.id as number,
+      interestType: 'FLAT',
+      defaultInterestRate: 5.0
+    }).subscribe({
+      next: (response) => {
+        this.isMakingLender = false;
+        this.successMessage = response.message || 'Organisation has been made a lender';
+        if (this.organization) {
+          this.organization.isLender = true;
+        }
+      },
+      error: (error) => {
+        this.isMakingLender = false;
+        const backendMessage =
+          error?.error?.error ||
+          error?.error?.message ||
+          error?.message;
+        this.error = backendMessage || 'Failed to make organisation a lender. Please try again.';
+        console.error('Error making organization lender:', error);
+      }
+    });
   }
 }

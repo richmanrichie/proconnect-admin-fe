@@ -8,8 +8,6 @@ declare const window: any;
   providedIn: 'root'
 })
 export class PaymentService {
-  private readonly MERCHANT_CODE =  'MX249412';
-  private readonly PAY_ITEM_ID = 'Default_Payable_MX249412';
   private readonly CURRENCY_CODE = 566; // NGN
 
   constructor(private sanitizer: DomSanitizer) {}
@@ -17,11 +15,17 @@ export class PaymentService {
   async initiatePayment(params: {
     amount: number;
     reference: string;
+    merchantCode: string;
+    payItemId: string;
+    payItemName: string;
     customerEmail: string;
     customerName: string;
     onComplete: (response: any) => void;
     onClose?: () => void;
   }) {
+
+    console.log("I am paying");
+    
     try {
       // Sanitize the redirect URL
       const sanitizedRedirectUrl = this.sanitizer.sanitize(
@@ -34,13 +38,14 @@ export class PaymentService {
       }
 
       const paymentRequest = {
-        merchant_code: this.MERCHANT_CODE,
-        pay_item_id: this.PAY_ITEM_ID,
+        merchant_code: params.merchantCode,
+        pay_item_id: params.payItemId,
+        pay_item_name: params.payItemName,
         txn_ref: params.reference,
-        amount: (100 * 100).toString(), // Convert to kobo
+        amount: (params.amount * 100).toString(), // Convert to kobo
         currency: this.CURRENCY_CODE,
-        customer_email: params.customerEmail,
-        customer_name: params.customerName,
+        cust_email: params.customerEmail,
+        cust_name: params.customerName,
         site_redirect_url: sanitizedRedirectUrl,
         mode: environment.production ? 'LIVE' : 'TEST',
         onComplete: params.onComplete,
@@ -48,6 +53,8 @@ export class PaymentService {
       };
 
       console.log(paymentRequest);
+
+
       if (typeof window.webpayCheckout === 'function') {
         window.webpayCheckout(paymentRequest);
       } else {

@@ -82,14 +82,25 @@ export class LoanDetailComponent implements OnInit {
       return;
     }
 
-    const paymentAmount = this.loan.amount; // Or calculate the payment amount
-    const reference = `LOAN-${this.loan.id}-${Date.now()}`;
+    console.log('[makePayment] merchantCode:', this.loan.merchantCode, '| payableCode:', this.loan.payableCode);
+
+    if (!this.loan.merchantCode || !this.loan.payableCode) {
+      this.toastr.error('Payment configuration is missing for this loan.');
+      return;
+    }
+
+    const paymentAmount = this.loan.amount;
+    const reference = this.loan.order?.externalOrderNumber || `${this.loan.order?.orderNumber || this.loan.id}-${Date.now()}`;
     const customerEmail = this.loan.staff?.email || '';
     const customerName = this.loan.staffName || 'Customer';
+    const payItemName = this.loan.order?.items?.[0]?.productTitle || 'Loan Repayment';
 
     this.paymentService.initiatePayment({
       amount: paymentAmount,
       reference,
+      merchantCode: this.loan.merchantCode,
+      payItemId: this.loan.payableCode,
+      payItemName,
       customerEmail,
       customerName,
       onComplete: (response) => {

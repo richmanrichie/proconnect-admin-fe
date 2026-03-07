@@ -68,10 +68,17 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" [class.active]="activeTab === 'customer'" 
+              <a class="nav-link" [class.active]="activeTab === 'customer'"
                  (click)="activeTab = 'customer'"
                  style="cursor: pointer;">
                 <i class="ni ni-single-02 mr-2"></i>Customer Info
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" [class.active]="activeTab === 'order'"
+                 (click)="activeTab = 'order'"
+                 style="cursor: pointer;">
+                <i class="ni ni-cart mr-2"></i>Order Details
               </a>
             </li>
           </ul>
@@ -288,6 +295,83 @@
                     </div>
                     <div *ngIf="!loan.staff.address || loan.staff.address.length === 0" class="text-center py-4">
                       <p class="text-muted">No address information available</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Order Details Tab -->
+            <div *ngIf="activeTab === 'order' && loan.order">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="card bg-secondary shadow">
+                    <div class="card-body">
+                      <h6 class="heading-small text-muted mb-4">Order Information</h6>
+                      <div class="pl-lg-4">
+                        <div class="row">
+                          <div class="col-lg-6">
+                            <div class="form-group">
+                              <label class="form-control-label">Order Number</label>
+                              <div class="form-control-plaintext">{{ loan.order.orderNumber }}</div>
+                            </div>
+                          </div>
+                          <div class="col-lg-6">
+                            <div class="form-group">
+                              <label class="form-control-label">Status</label>
+                              <div class="form-control-plaintext">
+                                <span class="badge" [ngClass]="getStatusBadgeClass(loan.order.status)">
+                                  {{ loan.order.status | titlecase }}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-lg-6">
+                            <div class="form-group">
+                              <label class="form-control-label">Total Price</label>
+                              <div class="form-control-plaintext">{{ formatCurrency(loan.order.totalPrice) }}</div>
+                            </div>
+                          </div>
+                          <div class="col-lg-6">
+                            <div class="form-group">
+                              <label class="form-control-label">Date</label>
+                              <div class="form-control-plaintext">{{ loan.order.createdAt | date: 'medium' }}</div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-lg-6">
+                            <div class="form-group">
+                              <label class="form-control-label">Merchant Code</label>
+                              <div class="form-control-plaintext">{{ loan.order.merchantCode }}</div>
+                            </div>
+                          </div>
+                          <div class="col-lg-6">
+                            <div class="form-group">
+                              <label class="form-control-label">Payable Code</label>
+                              <div class="form-control-plaintext">{{ loan.order.payableCode }}</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="card bg-secondary shadow">
+                    <div class="card-body">
+                      <h6 class="heading-small text-muted mb-4">Order Items</h6>
+                      <div *ngFor="let item of loan.order.items" class="d-flex align-items-center mb-3">
+                        <img *ngIf="item.imageUrl" [src]="item.imageUrl" alt="{{ item.productTitle }}"
+                             class="rounded mr-3" style="width: 56px; height: 56px; object-fit: cover;">
+                        <div class="flex-grow-1">
+                          <div class="font-weight-bold">{{ item.productTitle || 'Product' }}</div>
+                          <div class="text-sm text-muted">Qty: {{ item.quantity }}</div>
+                        </div>
+                        <div class="font-weight-bold">{{ formatCurrency(item.price) }}</div>
+                      </div>
                     </div>
                   </div>
                 </div>

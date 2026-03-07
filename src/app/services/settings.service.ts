@@ -13,6 +13,16 @@ export interface Tenure {
   updatedAt?: string;
 }
 
+export interface FixedInterestRate {
+  id: number;
+  minAmount: number;
+  maxAmount: number;
+  interestRate: number;
+  interestType: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface ApiResponse<T> {
   status: string;
   data: T;
@@ -44,5 +54,13 @@ export class SettingsService {
 
   deleteTenure(id: number): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/tenure/${id}`);
+  }
+
+  getFixedInterestRate(): Observable<ApiResponse<FixedInterestRate>> {
+    return this.http.get<ApiResponse<FixedInterestRate>>(`${this.apiUrl}/fixed-interest-rate`);
+  }
+
+  updateFixedInterestRate(interestRate: number): Observable<ApiResponse<FixedInterestRate>> {
+    return this.http.put<ApiResponse<FixedInterestRate>>(`${this.apiUrl}/fixed-interest-rate`, { interestRate });
   }
 }

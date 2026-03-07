@@ -31,6 +31,25 @@ export interface LoanSchedule {
   balance: number;
 }
 
+export interface OrderItem {
+  productTitle: string;
+  quantity: number;
+  price: number;
+  imageUrl: string;
+}
+
+export interface Order {
+  id: number;
+  orderNumber: number;
+  externalOrderNumber: string;
+  totalPrice: number;
+  status: string;
+  createdAt: string;
+  items: OrderItem[];
+  payableCode: string;
+  merchantCode: string;
+}
+
 export interface Loan {
   id: number;
   staff: Staff;
@@ -46,6 +65,9 @@ export interface Loan {
   approvedBy: string | null;
   createdAt: string;
   updatedAt: string;
+  merchantCode: string;
+  payableCode: string;
+  order: Order;
 }
 
 export interface LoanListResponse {

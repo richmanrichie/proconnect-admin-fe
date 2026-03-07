@@ -31,16 +31,8 @@ export class LoanSettingsComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  // Mock data for testing
-  private tenures: Tenure[] = [
-    { id: 1, tenureMonths: 3, minAmount: 10000, maxAmount: 500000, isActive: true },
-    { id: 2, tenureMonths: 6, minAmount: 10000, maxAmount: 1000000, isActive: true },
-    { id: 3, tenureMonths: 12, minAmount: 10000, maxAmount: 2000000, isActive: true },
-    { id: 4, tenureMonths: 24, minAmount: 10000, maxAmount: 5000000, isActive: false },
-  ];
 
-  // Mock interest rate
-  currentInterestRate = 8.5;
+  currentInterestRate: number | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -52,6 +44,7 @@ export class LoanSettingsComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    this.loadFixedInterestRate();
     this.loadLoanSettings();
   }
 
@@ -62,9 +55,22 @@ export class LoanSettingsComponent implements OnInit, AfterViewInit {
     }
   }
 
+  private loadFixedInterestRate(): void {
+    this.settingsService.getFixedInterestRate().subscribe({
+      next: (response) => {
+        if (response.status === 'SUCCESS') {
+          this.interestRateForm.patchValue({ rate: response.data.interestRate });
+        }
+      },
+      error: (error) => {
+        console.error('Error loading interest rate:', error);
+      }
+    });
+  }
+
   private initializeForms(): void {
     this.interestRateForm = this.fb.group({
-      rate: [this.currentInterestRate, [Validators.required, Validators.min(0.1), Validators.max(100)]]
+      rate: [null, [Validators.required, Validators.min(0.1), Validators.max(100)]]
     });
 
     this.tenureForm = this.fb.group({
@@ -135,15 +141,31 @@ export class LoanSettingsComponent implements OnInit, AfterViewInit {
     }
 
     this.isSubmitting = true;
-    
-    // TODO: Implement API call to update interest rate
-    setTimeout(() => {
-      this.isSubmitting = false;
-      this.snackBar.open('Interest rate updated successfully', 'Close', {
-        duration: 3000,
-        panelClass: ['success-snackbar']
+
+    this.settingsService.updateFixedInterestRate(this.interestRateForm.value.rate)
+      .pipe(
+        finalize(() => this.isSubmitting = false)
+      )
+      .subscribe({
+        next: (response) => {
+          if (response.status === 'SUCCESS') {
+            this.snackBar.open('Interest rate updated successfully', 'Close', {
+              duration: 3000,
+              panelClass: ['success-snackbar']
+            });
+          } else {
+            throw new Error(response.message || 'Failed to update interest rate');
+          }
+        },
+        error: (error) => {
+          console.error('Error updating interest rate:', error);
+          const errorMessage = error?.error?.message || error.message || 'Failed to update interest rate';
+          this.snackBar.open(errorMessage, 'Close', {
+            duration: 5000,
+            panelClass: ['error-snackbar']
+          });
+        }
       });
-    }, 1000);
   }
 
   onAddTenure(): void {

@@ -10,6 +10,7 @@ import { environment } from '../../environments/environment';
 })
 export class OrganizationService {
   private apiUrl = `${environment.apiBaseUrl}/organisations`;
+  private lenderUrl = `${environment.apiBaseUrl}/lender`;
 
   constructor(private http: HttpClient) {}
 
@@ -57,5 +58,16 @@ export class OrganizationService {
    */
   deleteOrganization(id: number): Observable<OrganizationResponse> {
     return this.http.delete<OrganizationResponse>(`${this.apiUrl}/${id}`);
+  }
+
+  /**
+   * Make an organization a lender
+   */
+  makeOrganizationLender(payload: {
+    organisationId: number;
+    interestType: string;
+    defaultInterestRate: number;
+  }): Observable<OrganizationResponse> {
+    return this.http.post<OrganizationResponse>(`${this.lenderUrl}/make-lender`, payload);
   }
 }
