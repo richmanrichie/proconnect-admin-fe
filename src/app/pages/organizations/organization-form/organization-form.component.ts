@@ -45,7 +45,7 @@ export class OrganizationFormComponent implements OnInit {
       address: ['', Validators.maxLength(255)],
       cacRegNumber: ['', Validators.maxLength(50)],
       taxId: ['', Validators.maxLength(50)],
-      emailDomain: ['', [Validators.maxLength(100), Validators.pattern('^[^@\s]+$')]],
+      emailDomain: ['', [Validators.maxLength(100), Validators.pattern('^[^@\\s]+$')]],
       logoUrl: ['', Validators.maxLength(255)],
       primaryEmail: ['', [Validators.required, Validators.email, Validators.maxLength(100)]],
       secondEmail: ['', [Validators.email, Validators.maxLength(100)]],
