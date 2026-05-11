@@ -29,6 +29,7 @@ export const DEFAULT_ROUTES: RouteInfo[] = [
 export class SidebarComponent implements OnInit, OnDestroy {
   public menuItems: RouteInfo[] = [];
   public isCollapsed = true;
+  public isMenuLoading = true;
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -50,10 +51,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   private loadMenu() {
-    // First set default menu items
-    this.menuItems = [...DEFAULT_ROUTES];
-    
-    // Then try to load dynamic menu
+    this.isMenuLoading = true;
+    this.menuItems = [];
+
     this.adminService.getMenu()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -66,12 +66,15 @@ export class SidebarComponent implements OnInit, OnDestroy {
               class: '',
               image: item.icon
             }));
+          } else {
+            this.menuItems = [...DEFAULT_ROUTES];
           }
+          this.isMenuLoading = false;
         },
         error: (error) => {
           console.error('Failed to load menu:', error);
-          // Keep default menu items if API fails
           this.menuItems = [...DEFAULT_ROUTES];
+          this.isMenuLoading = false;
         }
       });
   }

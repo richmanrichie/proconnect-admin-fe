@@ -26,7 +26,7 @@ export class LoanSettingsComponent implements OnInit, AfterViewInit {
   
   // Table data
   dataSource: MatTableDataSource<Tenure>;
-  displayedColumns: string[] = ['tenureMonths', 'minAmount', 'maxAmount', 'status', 'actions'];
+  displayedColumns: string[] = ['tenureMonths', 'minAmount', 'maxAmount'];
   
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;

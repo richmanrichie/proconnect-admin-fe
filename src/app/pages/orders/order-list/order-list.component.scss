@@ -53,3 +53,12 @@
   height: 1.5rem;
   border-width: 0.2em;
 }
+
+// Fix dropdown being clipped by table-responsive overflow
+.table-responsive {
+  overflow: visible;
+}
+
+.dropdown-menu {
+  z-index: 1050;
+}

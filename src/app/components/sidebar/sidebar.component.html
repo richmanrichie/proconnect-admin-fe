@@ -89,12 +89,24 @@
       </form>
       <!-- Navigation -->
       <ul class="navbar-nav">
-          <li *ngFor="let menuItem of menuItems" class="{{menuItem.class}} nav-item">
-              <a routerLinkActive="active" [routerLink]="[menuItem.path]" class="nav-link">
-                  <i class="ni {{menuItem.icon}}"></i>
-                  {{menuItem.title}}
-              </a>
-          </li>
+          <!-- Shimmer loading state -->
+          <ng-container *ngIf="isMenuLoading">
+              <li *ngFor="let item of [1,2,3,4]" class="nav-item">
+                  <div class="nav-link shimmer-item">
+                      <span class="shimmer shimmer-icon"></span>
+                      <span class="shimmer shimmer-text"></span>
+                  </div>
+              </li>
+          </ng-container>
+          <!-- Actual menu items -->
+          <ng-container *ngIf="!isMenuLoading">
+              <li *ngFor="let menuItem of menuItems" class="{{menuItem.class}} nav-item">
+                  <a routerLinkActive="active" [routerLink]="[menuItem.path]" class="nav-link">
+                      <i class="ni {{menuItem.icon}}"></i>
+                      {{menuItem.title}}
+                  </a>
+              </li>
+          </ng-container>
           <li class="nav-item mt-3">
               <a href="javascript:void(0)" class="nav-link text-danger" (click)="logout()">
                   <i class="ni ni-user-run text-danger"></i>

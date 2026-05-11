@@ -184,38 +184,6 @@
               </td>
             </ng-container>
 
-            <!-- Status Column -->
-            <ng-container matColumnDef="status">
-              <th mat-header-cell *matHeaderCellDef>Status</th>
-              <td mat-cell *matCellDef="let tenure">
-                <span class="badge badge-dot mr-4">
-                  <i [ngClass]="tenure.isActive ? 'bg-success' : 'bg-warning'"></i>
-                  {{ tenure.isActive ? 'Active' : 'Inactive' }}
-                </span>
-              </td>
-            </ng-container>
-
-            <!-- Actions Column -->
-            <ng-container matColumnDef="actions">
-              <th mat-header-cell *matHeaderCellDef class="text-right">Actions</th>
-              <td mat-cell *matCellDef="let tenure" class="text-right">
-                <div class="dropdown">
-                  <button mat-icon-button [matMenuTriggerFor]="menu">
-                    <i class="fas fa-ellipsis-v"></i>
-                  </button>
-                  <mat-menu #menu="matMenu">
-                    <button mat-menu-item (click)="onToggleTenureStatus(tenure)" [disabled]="isUpdatingStatus === tenure.id">
-                      <i class="ni mr-2" [class.ni-check-bold]="!tenure.isActive" [class.ni-fat-remove]="tenure.isActive"></i>
-                      {{ tenure.isActive ? 'Deactivate' : 'Activate' }}
-                    </button>
-                    <button mat-menu-item (click)="onDeleteTenure(tenure)" class="text-danger">
-                      <i class="ni ni-fat-remove mr-2"></i> Delete
-                    </button>
-                  </mat-menu>
-                </div>
-              </td>
-            </ng-container>
-
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
           </table>

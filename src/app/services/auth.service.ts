@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 import { Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
+import { AdminService } from './admin.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,8 @@ export class AuthService {
 
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private adminService: AdminService
   ) {}
 
   // Check if user is authenticated
@@ -38,6 +40,7 @@ export class AuthService {
   logout(): void {
     sessionStorage.removeItem(this.SESSION_KEY);
     sessionStorage.removeItem(this.FIRST_LOGIN_KEY);
+    this.adminService.clearCache();
     this.router.navigate(['/login']);
   }
 
