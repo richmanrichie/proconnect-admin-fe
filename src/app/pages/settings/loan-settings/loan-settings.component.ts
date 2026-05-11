@@ -23,10 +23,14 @@ export class LoanSettingsComponent implements OnInit, AfterViewInit {
   isLoading = false;
   isSubmitting = false;
   isUpdatingStatus: number | null = null;
+
+  // Edit mode
+  isEditMode = false;
+  editingTenureId: number | null = null;
   
   // Table data
   dataSource: MatTableDataSource<Tenure>;
-  displayedColumns: string[] = ['tenureMonths', 'minAmount', 'maxAmount'];
+  displayedColumns: string[] = ['tenureMonths', 'minAmount', 'maxAmount', 'actions'];
   
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -88,24 +92,17 @@ export class LoanSettingsComponent implements OnInit, AfterViewInit {
         finalize(() => this.isLoading = false)
       )
       .subscribe({
-        next: (response: ApiResponse<Tenure[]>) => {
-          if (response.status === 'SUCCESS') {
-            const tenures = response.data.map((tenure: Tenure) => ({
+        next: (response: any) => {
+          if (response.status === 'SUCCESS' || response.success || response.data) {
+            const tenures = (response.data || []).map((tenure: Tenure) => ({
               ...tenure,
               months: this.getMonthsText(tenure.tenureMonths)
             }));
 
-            if (!this.dataSource) {
-              this.dataSource = new MatTableDataSource<Tenure>(tenures);
-              if (this.paginator) {
-                this.dataSource.paginator = this.paginator;
-              }
-              if (this.sort) {
-                this.dataSource.sort = this.sort;
-              }
-            } else {
-              this.dataSource.data = tenures;
-            }
+            // Always create a new data source to ensure refresh
+            this.dataSource = new MatTableDataSource<Tenure>(tenures);
+            this.dataSource.paginator = this.paginator;
+            this.dataSource.sort = this.sort;
           } else {
             throw new Error(response.message || 'Failed to load tenures');
           }
@@ -174,7 +171,7 @@ export class LoanSettingsComponent implements OnInit, AfterViewInit {
     }
 
     const formValue = this.tenureForm.value;
-    
+
     // Validate minAmount is less than maxAmount
     if (Number(formValue.minAmount) >= Number(formValue.maxAmount)) {
       this.snackBar.open('Minimum amount must be less than maximum amount', 'Close', {
@@ -184,39 +181,61 @@ export class LoanSettingsComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    const newTenure = {
+    const tenureData = {
       tenureMonths: Number(formValue.tenureMonths),
       minAmount: Number(formValue.minAmount),
       maxAmount: Number(formValue.maxAmount)
     };
 
     this.isSubmitting = true;
-    
-    this.settingsService.createTenure(newTenure)
+    const wasEditMode = this.isEditMode;
+
+    // Check if we're editing or creating
+    const request = this.isEditMode && this.editingTenureId
+      ? this.settingsService.updateTenure(this.editingTenureId, tenureData)
+      : this.settingsService.createTenure(tenureData);
+
+    request
       .pipe(
         finalize(() => this.isSubmitting = false)
       )
       .subscribe({
         next: (response) => {
-          if (response.status === 'SUCCESS') {
-            this.tenureForm.reset();
+          if (response.status === 'SUCCESS' || response.data) {
+            const message = wasEditMode ? 'Tenure updated successfully' : 'Tenure added successfully';
+            this.cancelEdit();
             this.loadLoanSettings(); // Refresh the list
-            this.snackBar.open('Tenure added successfully', 'Close', {
-              duration: 3000,
-              panelClass: ['success-snackbar']
-            });
+            this.snackBar.open(message, 'Close', { duration: 3000, panelClass: ['success-snackbar'] });
           } else {
-            throw new Error(response.message || 'Failed to add tenure');
+            throw new Error(response.message || (wasEditMode ? 'Failed to update tenure' : 'Failed to add tenure'));
           }
         },
         error: (error) => {
-          console.error('Error adding tenure:', error);
-          this.snackBar.open(error.message || 'Failed to add tenure', 'Close', {
+          console.error('Error saving tenure:', error);
+          this.snackBar.open(error.message || 'Failed to save tenure', 'Close', {
             duration: 5000,
             panelClass: ['error-snackbar']
           });
         }
       });
+  }
+
+  onEditTenure(tenure: Tenure): void {
+    this.isEditMode = true;
+    this.editingTenureId = tenure.id || null;
+    this.tenureForm.patchValue({
+      tenureMonths: tenure.tenureMonths,
+      minAmount: tenure.minAmount,
+      maxAmount: tenure.maxAmount
+    });
+    // Scroll to form
+    document.querySelector('.heading-small')?.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  cancelEdit(): void {
+    this.isEditMode = false;
+    this.editingTenureId = null;
+    this.tenureForm.reset();
   }
 
   onToggleTenureStatus(tenure: Tenure): void {
@@ -286,28 +305,24 @@ export class LoanSettingsComponent implements OnInit, AfterViewInit {
 
   private deleteTenure(tenure: Tenure): void {
     if (!tenure.id) return;
-    
+
     this.isLoading = true;
-    
+
     this.settingsService.deleteTenure(tenure.id)
       .pipe(
         finalize(() => this.isLoading = false)
       )
       .subscribe({
-        next: (response) => {
-          if (response.status === 'SUCCESS') {
-            this.loadLoanSettings(); // Refresh the list
-            this.snackBar.open('Tenure deleted successfully', 'Close', {
-              duration: 3000,
-              panelClass: ['success-snackbar']
-            });
-          } else {
-            throw new Error(response.message || 'Failed to delete tenure');
-          }
+        next: () => {
+          this.snackBar.open('Tenure deleted successfully', 'Close', {
+            duration: 3000,
+            panelClass: ['success-snackbar']
+          });
+          this.loadLoanSettings(); // Refresh the list
         },
         error: (error) => {
           console.error('Error deleting tenure:', error);
-          this.snackBar.open(error.message || 'Failed to delete tenure', 'Close', {
+          this.snackBar.open(error?.error?.message || error.message || 'Failed to delete tenure', 'Close', {
             duration: 5000,
             panelClass: ['error-snackbar']
           });

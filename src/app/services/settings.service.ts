@@ -56,6 +56,10 @@ export class SettingsService {
     return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/tenure/${id}`);
   }
 
+  updateTenure(id: number, tenure: Omit<Tenure, 'id' | 'createdAt' | 'updatedAt'>): Observable<ApiResponse<Tenure>> {
+    return this.http.put<ApiResponse<Tenure>>(`${this.apiUrl}/tenure/${id}`, tenure);
+  }
+
   getFixedInterestRate(): Observable<ApiResponse<FixedInterestRate>> {
     return this.http.get<ApiResponse<FixedInterestRate>>(`${this.apiUrl}/fixed-interest-rate`);
   }

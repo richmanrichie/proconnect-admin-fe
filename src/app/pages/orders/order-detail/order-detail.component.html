@@ -188,7 +188,7 @@
                     </div>
                   </div>
                   
-                  <!-- Loan Calculation -->
+                  <!-- Loan Calculation (Flat Rate) -->
                   <div class="row mt-4">
                     <div class="col-12">
                       <div class="table-responsive">
@@ -205,23 +205,23 @@
                               <td class="text-right">{{ order.loan.loanAmount | currency:'NGN':'symbol-narrow':'1.2-2' }}</td>
                             </tr>
                             <tr>
-                              <td>Interest ({{ order.loan.interestRate }}% for {{ order.loan.tenureMonths }} months)</td>
+                              <td>Interest ({{ order.loan.interestRate }}% x {{ order.loan.tenureMonths }} months)</td>
                               <td class="text-right">
-                                {{ (order.loan.loanAmount * (order.loan.interestRate / 100) * (order.loan.tenureMonths / 12)) | number:'1.2-2' }}
+                                {{ (order.loan.loanAmount * (order.loan.interestRate / 100) * order.loan.tenureMonths) | currency:'NGN':'symbol-narrow':'1.2-2' }}
                               </td>
                             </tr>
                             <tr>
                               <td><strong>Total Repayment</strong></td>
                               <td class="text-right">
                                 <strong>
-                                  {{ (order.loan.loanAmount + (order.loan.loanAmount * (order.loan.interestRate / 100) * (order.loan.tenureMonths / 12))) | currency:'NGN':'symbol-narrow':'1.2-2' }}
+                                  {{ (order.loan.loanAmount * (1 + (order.loan.interestRate / 100) * order.loan.tenureMonths)) | currency:'NGN':'symbol-narrow':'1.2-2' }}
                                 </strong>
                               </td>
                             </tr>
                             <tr>
                               <td>Monthly Payment</td>
                               <td class="text-right">
-                                {{ ((order.loan.loanAmount + (order.loan.loanAmount * (order.loan.interestRate / 100) * (order.loan.tenureMonths / 12))) / order.loan.tenureMonths) | currency:'NGN':'symbol-narrow':'1.2-2' }}
+                                {{ (order.loan.loanAmount * (1 + (order.loan.interestRate / 100) * order.loan.tenureMonths) / order.loan.tenureMonths) | currency:'NGN':'symbol-narrow':'1.2-2' }}
                               </td>
                             </tr>
                           </tbody>

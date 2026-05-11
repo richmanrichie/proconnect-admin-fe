@@ -1,0 +1,21 @@
+// Fix dropdown being clipped by table-responsive overflow
+.table-responsive {
+  overflow: visible;
+}
+
+.mat-mdc-menu-panel,
+.mat-menu-panel {
+  z-index: 1050;
+}
+
+// Style for action menu button
+.action-menu-btn {
+  background: transparent;
+  border: none;
+  color: #8898aa;
+  cursor: pointer;
+
+  &:hover {
+    color: #525f7f;
+  }
+}
