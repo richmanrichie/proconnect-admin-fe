@@ -26,6 +26,7 @@ export class DashboardComponent implements OnInit {
 
   isOrgAdmin = false;
   isSuperAdmin = false;
+  roleResolved = false;
 
   constructor(private adminService: AdminService, private router: Router) {}
 
@@ -35,7 +36,9 @@ export class DashboardComponent implements OnInit {
         this.isOrgAdmin = true;
       } else if (user.role === 'SUPER_ADMIN') {
         this.isSuperAdmin = true;
-      } else {
+      }
+      this.roleResolved = true;
+      if (!this.isOrgAdmin && !this.isSuperAdmin) {
         this.initCharts();
       }
     });
