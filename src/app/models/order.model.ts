@@ -36,6 +36,14 @@ export interface OrderLoan {
   interestRate: number;
 }
 
+export interface SchedulePreview {
+  month: number;
+  principal: number;
+  interest: number;
+  totalPayment: number;
+  balance: number;
+}
+
 export interface Order {
   id: number;
   orderNumber: number;
@@ -45,6 +53,7 @@ export interface Order {
   items: OrderItem[];
   staff: Staff;
   loan?: OrderLoan;
+  schedulePreview?: SchedulePreview[];
   // For list view compatibility
   itemsCount?: number;
   imageUrl?: string;

@@ -6,7 +6,8 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-organization-detail',
-  templateUrl: './organization-detail.component.html'
+  templateUrl: './organization-detail.component.html',
+  styleUrls: ['./organization-detail.component.scss']
 })
 export class OrganizationDetailComponent implements OnInit {
   organization: Organization | null = null;
@@ -14,6 +15,7 @@ export class OrganizationDetailComponent implements OnInit {
   error = '';
   successMessage = '';
   isMakingLender = false;
+  activeTab = 'details';
 
   constructor(
     private route: ActivatedRoute,

@@ -177,7 +177,7 @@
                     <div class="col-md-4">
                       <div class="text-center">
                         <h5 class="text-muted mb-0">Interest Rate</h5>
-                        <h3 class="text-white">{{ order.loan.interestRate }}%</h3>
+                        <h3 class="text-white">{{ order.loan.interestRate }}% p.a</h3>
                       </div>
                     </div>
                     <div class="col-md-4">
@@ -188,43 +188,39 @@
                     </div>
                   </div>
                   
-                  <!-- Loan Calculation (Flat Rate) -->
-                  <div class="row mt-4">
+                  <!-- Repayment Schedule -->
+                  <div class="row mt-4" *ngIf="order.schedulePreview?.length">
                     <div class="col-12">
+                      <h5 class="text-white mb-3">Repayment Schedule</h5>
                       <div class="table-responsive">
                         <table class="table table-dark">
                           <thead>
                             <tr>
-                              <th>Description</th>
-                              <th class="text-right">Amount</th>
+                              <th>Month</th>
+                              <th class="text-right">Principal</th>
+                              <th class="text-right">Interest</th>
+                              <th class="text-right">Total Payment</th>
+                              <th class="text-right">Balance</th>
                             </tr>
                           </thead>
                           <tbody>
-                            <tr>
-                              <td>Principal Amount</td>
-                              <td class="text-right">{{ order.loan.loanAmount | currency:'NGN':'symbol-narrow':'1.2-2' }}</td>
-                            </tr>
-                            <tr>
-                              <td>Interest ({{ order.loan.interestRate }}% x {{ order.loan.tenureMonths }} months)</td>
-                              <td class="text-right">
-                                {{ (order.loan.loanAmount * (order.loan.interestRate / 100) * order.loan.tenureMonths) | currency:'NGN':'symbol-narrow':'1.2-2' }}
-                              </td>
-                            </tr>
-                            <tr>
-                              <td><strong>Total Repayment</strong></td>
-                              <td class="text-right">
-                                <strong>
-                                  {{ (order.loan.loanAmount * (1 + (order.loan.interestRate / 100) * order.loan.tenureMonths)) | currency:'NGN':'symbol-narrow':'1.2-2' }}
-                                </strong>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>Monthly Payment</td>
-                              <td class="text-right">
-                                {{ (order.loan.loanAmount * (1 + (order.loan.interestRate / 100) * order.loan.tenureMonths) / order.loan.tenureMonths) | currency:'NGN':'symbol-narrow':'1.2-2' }}
-                              </td>
+                            <tr *ngFor="let schedule of order.schedulePreview">
+                              <td>{{ schedule.month }}</td>
+                              <td class="text-right">{{ schedule.principal | currency:'NGN':'symbol-narrow':'1.2-2' }}</td>
+                              <td class="text-right">{{ schedule.interest | currency:'NGN':'symbol-narrow':'1.2-2' }}</td>
+                              <td class="text-right">{{ schedule.totalPayment | currency:'NGN':'symbol-narrow':'1.2-2' }}</td>
+                              <td class="text-right">{{ schedule.balance | currency:'NGN':'symbol-narrow':'1.2-2' }}</td>
                             </tr>
                           </tbody>
+                          <tfoot>
+                            <tr class="font-weight-bold">
+                              <td>Total</td>
+                              <td class="text-right">{{ order.loan.loanAmount | currency:'NGN':'symbol-narrow':'1.2-2' }}</td>
+                              <td class="text-right">{{ getTotalInterest() | currency:'NGN':'symbol-narrow':'1.2-2' }}</td>
+                              <td class="text-right">{{ getTotalRepayment() | currency:'NGN':'symbol-narrow':'1.2-2' }}</td>
+                              <td class="text-right">-</td>
+                            </tr>
+                          </tfoot>
                         </table>
                       </div>
                     </div>

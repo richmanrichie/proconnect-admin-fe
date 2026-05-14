@@ -7,6 +7,41 @@
   </div>
 </div>
 
+<!-- Repayment Modal -->
+<ng-template #repaymentModal let-modal>
+  <div *ngIf="!repaymentSuccess">
+    <div class="modal-header">
+      <h5 class="modal-title">Make Repayment</h5>
+      <button type="button" class="close" (click)="modal.dismiss()">
+        <span>&times;</span>
+      </button>
+    </div>
+    <div class="modal-body p-4">
+      <div class="form-group">
+        <label class="form-control-label">Amount (₦)</label>
+        <input type="number" class="form-control" [(ngModel)]="repaymentAmount"
+               placeholder="Enter repayment amount" min="1" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
+      <button class="btn btn-primary" [disabled]="isProcessingRepayment || !repaymentAmount"
+              (click)="makeRepayment(modal)">
+        <span *ngIf="isProcessingRepayment" class="spinner-border spinner-border-sm mr-2" role="status"></span>
+        {{ isProcessingRepayment ? 'Processing...' : 'Submit Repayment' }}
+      </button>
+    </div>
+  </div>
+  <div *ngIf="repaymentSuccess" class="modal-body text-center p-5">
+    <div class="icon icon-shape icon-lg bg-success text-white rounded-circle shadow mb-4 mx-auto">
+      <i class="ni ni-check-bold" style="font-size: 1.5rem;"></i>
+    </div>
+    <h3 class="text-success mb-2">Repayment Successful</h3>
+    <p class="text-muted mb-4">{{ repaymentResultMessage }}</p>
+    <button class="btn btn-primary px-5" (click)="modal.close()">Done</button>
+  </div>
+</ng-template>
+
 <!-- Payment Result Modal -->
 <ng-template #paymentResultModal let-modal>
   <div class="modal-body text-center p-5">
@@ -49,10 +84,15 @@
           <button class="btn btn-sm btn-neutral" (click)="goBack()">
             <i class="ni ni-bold-left"></i> Back to List
           </button>
-          <button *ngIf="loan?.status === 'APPROVED_BY_LENDER'" 
-                  class="btn btn-sm btn-success ml-2" 
+          <button *ngIf="loan?.status === 'APPROVED_BY_LENDER'"
+                  class="btn btn-sm btn-success ml-2"
                   (click)="makePayment()">
             <i class="ni ni-money-coins mr-1"></i> Make Payment
+          </button>
+          <button *ngIf="loan?.status === 'ACTIVE'"
+                  class="btn btn-sm btn-warning ml-2"
+                  (click)="openRepaymentModal()">
+            <i class="ni ni-curved-next mr-1"></i> Repay
           </button>
         </div>
       </div>
@@ -193,15 +233,15 @@
                         </div>
                         <div class="d-flex justify-content-between mb-3">
                           <span>Total Interest:</span>
-                          <strong>{{ formatCurrency(loan.amount * (loan.interestRate / 100)) }}</strong>
+                          <strong>{{ formatCurrency(getTotalInterest()) }}</strong>
                         </div>
                         <div class="d-flex justify-content-between mb-3">
                           <span>Total Repayment:</span>
-                          <strong>{{ formatCurrency(loan.amount * (1 + loan.interestRate / 100)) }}</strong>
+                          <strong>{{ formatCurrency(getTotalRepayment()) }}</strong>
                         </div>
                         <div class="d-flex justify-content-between mb-3">
                           <span>Monthly Payment:</span>
-                          <strong>{{ formatCurrency((loan.amount * (1 + loan.interestRate / 100)) / loan.durationMonths) }}</strong>
+                          <strong>{{ formatCurrency(getMonthlyPayment()) }}</strong>
                         </div>
                       </div>
                     </div>
@@ -220,20 +260,24 @@
                     <th>Principal</th>
                     <th>Interest</th>
                     <th>Total Payment</th>
+                    <th>Amount Paid</th>
                     <th>Balance</th>
                     <th>Status</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let item of loan.schedules; let i = index">
+                  <tr *ngFor="let item of sortedSchedules; let i = index">
                     <td>{{ i + 1 }}</td>
-                    <td>--</td>
+                    <td>{{ item.dueDate | date: 'mediumDate' }}</td>
                     <td>{{ formatCurrency(item.principal) }}</td>
                     <td>{{ formatCurrency(item.interest) }}</td>
                     <td>{{ formatCurrency(item.totalPayment) }}</td>
+                    <td>{{ formatCurrency(item.amountPaid) }}</td>
                     <td>{{ formatCurrency(item.balance) }}</td>
                     <td>
-                      <span class="badge badge-warning">Pending</span>
+                      <span class="badge" [ngClass]="getScheduleStatusBadgeClass(item.paymentStatus)">
+                        {{ item.paymentStatus | titlecase }}
+                      </span>
                     </td>
                   </tr>
                 </tbody>

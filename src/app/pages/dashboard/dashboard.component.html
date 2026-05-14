@@ -1,3 +1,7 @@
+<app-org-dashboard *ngIf="isOrgAdmin"></app-org-dashboard>
+<app-super-admin-dashboard *ngIf="isSuperAdmin"></app-super-admin-dashboard>
+
+<ng-container *ngIf="!isOrgAdmin && !isSuperAdmin">
 <div class="header bg-gradient-danger pb-8 pt-5 pt-md-8">
   <div class="container-fluid">
     <div class="header-body">
@@ -367,3 +371,4 @@
     </div>
   </div>
 </div>
+</ng-container>

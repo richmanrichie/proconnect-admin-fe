@@ -8,6 +8,8 @@ import { ClipboardModule } from 'ngx-clipboard';
 
 import { AdminLayoutRoutes } from './admin-layout.routing';
 import { DashboardComponent } from '../../pages/dashboard/dashboard.component';
+import { OrgDashboardComponent } from '../../pages/dashboard/org-dashboard/org-dashboard.component';
+import { SuperAdminDashboardComponent } from '../../pages/dashboard/super-admin-dashboard/super-admin-dashboard.component';
 import { IconsComponent } from '../../pages/icons/icons.component';
 import { MapsComponent } from '../../pages/maps/maps.component';
 import { UserProfileComponent } from '../../pages/user-profile/user-profile.component';
@@ -26,6 +28,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
   ],
   declarations: [
     DashboardComponent,
+    OrgDashboardComponent,
+    SuperAdminDashboardComponent,
     UserProfileComponent,
     TablesComponent,
     IconsComponent,

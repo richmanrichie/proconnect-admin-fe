@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Loan } from '../../../models/loan.model';
+import { Loan, ActiveLoan } from '../../../models/loan.model';
 import { LoanService } from '../../../services/loan.service';
 import { PaymentService } from '../../../services/payment.service';
 import { ToastrService } from 'ngx-toastr';
@@ -11,6 +11,9 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['./loan-list.component.scss']
 })
 export class LoanListComponent implements OnInit {
+  activeTab = 'approved';
+
+  // Approved loans
   loans: Loan[] = [];
   paginatedLoans: Loan[] = [];
   isLoading = false;
@@ -18,6 +21,15 @@ export class LoanListComponent implements OnInit {
   page = 1;
   pageSize = 10;
   collectionSize = 0;
+
+  // Active loans
+  activeLoans: ActiveLoan[] = [];
+  isLoadingActive = false;
+  activeLoansError = '';
+  activePage = 0; // 0-based for API
+  activePageSize = 20;
+  activeTotalElements = 0;
+  activeLoansLoaded = false;
 
   constructor(
     private loanService: LoanService,
@@ -70,6 +82,43 @@ export class LoanListComponent implements OnInit {
     this.router.navigate(['/loans', loanId]);
   }
 
+  switchTab(tab: string): void {
+    this.activeTab = tab;
+    if (tab === 'active' && !this.activeLoansLoaded) {
+      this.loadActiveLoans();
+    }
+  }
+
+  loadActiveLoans(): void {
+    this.isLoadingActive = true;
+    this.activeLoansError = '';
+    this.loanService.getActiveLoans(this.activePage, this.activePageSize).subscribe({
+      next: (response) => {
+        const data = response.data;
+        this.activeLoans = data.content;
+        this.activeTotalElements = data.totalElements;
+        this.activeLoansLoaded = true;
+        this.isLoadingActive = false;
+      },
+      error: (error) => {
+        console.error('Error loading active loans:', error);
+        this.activeLoansError = 'Failed to load active loans. Please try again later.';
+        this.isLoadingActive = false;
+        this.toastr.error('Failed to load active loans', 'Error');
+      }
+    });
+  }
+
+  onActivePageChange(page: number): void {
+    this.activePage = page - 1; // ngb-pagination is 1-based, API is 0-based
+    this.loadActiveLoans();
+  }
+
+  onActivePageSizeChange(): void {
+    this.activePage = 0;
+    this.loadActiveLoans();
+  }
+
 
 
   getStatusBadgeClass(status: string): string {
@@ -104,18 +153,17 @@ export class LoanListComponent implements OnInit {
     }
 
     const paymentAmount = loan.amount;
-    const reference = loan.order?.externalOrderNumber || `${loan.order?.orderNumber || loan.id}-${Date.now()}`;
     const customerEmail = loan.staff?.email || '';
+    const customerPhone = loan.staff?.phoneNumber || '';
     const customerName = loan.staffName || 'Customer';
-    const payItemName = loan.order?.items?.[0]?.productTitle || 'Loan Repayment';
 
     this.paymentService.initiatePayment({
       amount: paymentAmount,
-      reference,
+      reference: this.paymentService.generateReference(),
       merchantCode: loan.merchantCode,
       payItemId: loan.payableCode,
-      payItemName,
       customerEmail,
+      customerPhone,
       customerName,
       onComplete: (response) => {
         console.log('Payment response:', response);

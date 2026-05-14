@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { AdminService } from '../../services/admin.service';
 import Chart from 'chart.js';
 
 // core components
@@ -22,39 +24,48 @@ export class DashboardComponent implements OnInit {
   public clicked: boolean = true;
   public clicked1: boolean = false;
 
-  ngOnInit() {
+  isOrgAdmin = false;
+  isSuperAdmin = false;
 
+  constructor(private adminService: AdminService, private router: Router) {}
+
+  ngOnInit() {
+    this.adminService.getUser().subscribe(user => {
+      if (user.role === 'ADMIN_ORGANISATION') {
+        this.isOrgAdmin = true;
+      } else if (user.role === 'SUPER_ADMIN') {
+        this.isSuperAdmin = true;
+      } else {
+        this.initCharts();
+      }
+    });
+  }
+
+  private initCharts() {
     this.datasets = [
       [0, 20, 10, 30, 15, 40, 20, 60, 60],
       [0, 20, 5, 25, 10, 30, 15, 40, 40]
     ];
     this.data = this.datasets[0];
 
-
     var chartOrders = document.getElementById('chart-orders');
-
     parseOptions(Chart, chartOptions());
-
-
-    var ordersChart = new Chart(chartOrders, {
+    new Chart(chartOrders, {
       type: 'bar',
       options: chartExample2.options,
       data: chartExample2.data
     });
 
     var chartSales = document.getElementById('chart-sales');
-
     this.salesChart = new Chart(chartSales, {
-			type: 'line',
-			options: chartExample1.options,
-			data: chartExample1.data
-		});
+      type: 'line',
+      options: chartExample1.options,
+      data: chartExample1.data
+    });
   }
-
 
   public updateOptions() {
     this.salesChart.data.datasets[0].data = this.data;
     this.salesChart.update();
   }
-
 }

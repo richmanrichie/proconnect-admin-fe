@@ -7,6 +7,7 @@ import { NgbModule, NgbPaginationModule, NgbDropdownModule } from '@ng-bootstrap
 import { OrganizationListComponent } from './organization-list/organization-list.component';
 import { OrganizationFormComponent } from './organization-form/organization-form.component';
 import { OrganizationDetailComponent } from './organization-detail/organization-detail.component';
+import { OrganizationStoresComponent } from './organization-stores/organization-stores.component';
 
 const routes: Routes = [
   {
@@ -35,7 +36,8 @@ const routes: Routes = [
   declarations: [
     OrganizationListComponent,
     OrganizationFormComponent,
-    OrganizationDetailComponent
+    OrganizationDetailComponent,
+    OrganizationStoresComponent
   ],
   imports: [
     CommonModule,

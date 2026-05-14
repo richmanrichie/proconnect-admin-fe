@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Loan, LoanListResponse, LoanDetailResponse } from '../models/loan.model';
+import { Loan, LoanListResponse, LoanDetailResponse, ActiveLoan, ActiveLoanListResponse } from '../models/loan.model';
 
 @Injectable({
   providedIn: 'root'
@@ -46,6 +46,12 @@ export class LoanService {
     );
   }
 
+  getActiveLoans(page: number, size: number): Observable<ActiveLoanListResponse> {
+    return this.http.get<ActiveLoanListResponse>(`${this.apiUrl}/active`, {
+      params: { page: page.toString(), size: size.toString() }
+    });
+  }
+
   /**
    * Process payment for a loan
    */
@@ -55,6 +61,19 @@ export class LoanService {
 
   confirmOrderPayment(orderNumber: string, transactionRef: string): Observable<any> {
     return this.http.post(`${environment.apiBaseUrl}/orders/payment`, { orderNumber, transactionRef });
+  }
+
+  repayLoan(orderId: number, amount: number): Observable<any> {
+    return this.http.post(`${environment.apiBaseUrl}/orders/${orderId}/repay`, { amount });
+  }
+
+  /**
+   * Initiate payment for an order
+   * Must be called before showing the payment UI
+   */
+  initiatePayment(orderNumber: number, shippingOptionId?: string): Observable<any> {
+    const body = shippingOptionId ? { shippingOptionId } : {};
+    return this.http.post(`${environment.apiBaseUrl}/orders/${orderNumber}/initiate-payment`, body);
   }
 }
 

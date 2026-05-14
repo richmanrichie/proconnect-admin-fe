@@ -13,14 +13,19 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 })
 export class LoanDetailComponent implements OnInit {
   @ViewChild('paymentResultModal') paymentResultModal: TemplateRef<any>;
+  @ViewChild('repaymentModal') repaymentModal: TemplateRef<any>;
 
   loan: Loan | null = null;
   isLoading = false;
   isProcessingPayment = false;
+  isProcessingRepayment = false;
   errorMessage = '';
   activeTab = 'details';
   paymentSuccess = false;
   paymentResultMessage = '';
+  repaymentAmount: number | null = null;
+  repaymentResultMessage = '';
+  repaymentSuccess = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -89,62 +94,141 @@ export class LoanDetailComponent implements OnInit {
       return;
     }
 
-    console.log('[makePayment] merchantCode:', this.loan.merchantCode, '| payableCode:', this.loan.payableCode);
+    const orderNumber = this.loan.order?.orderNumber;
+    if (!orderNumber) {
+      this.toastr.error('Order information is missing for this loan.');
+      return;
+    }
 
     if (!this.loan.merchantCode || !this.loan.payableCode) {
       this.toastr.error('Payment configuration is missing for this loan.');
       return;
     }
 
-    const paymentAmount = this.loan.amount;
-    const reference = this.loan.order?.externalOrderNumber || `${this.loan.order?.orderNumber || this.loan.id}-${Date.now()}`;
-    const customerEmail = this.loan.staff?.email || '';
-    const customerName = this.loan.staffName || 'Customer';
-    const payItemName = this.loan.order?.items?.[0]?.productTitle || 'Loan Repayment';
+    // Step 1: Call backend to initiate payment
+    this.isProcessingPayment = true;
+    this.loanService.initiatePayment(orderNumber).subscribe({
+      next: (response) => {
+        this.isProcessingPayment = false;
 
-    this.paymentService.initiatePayment({
-      amount: paymentAmount,
-      reference,
-      merchantCode: this.loan.merchantCode,
-      payItemId: this.loan.payableCode,
-      payItemName,
-      customerEmail,
-      customerName,
-      onComplete: (response) => {
-        console.log('Payment response:', response);
-        if (response && response.txnref) {
-          this.isProcessingPayment = true;
-          const orderNumber = this.loan.order?.orderNumber?.toString() || '';
-          const transactionRef = response.txnref;
-          this.loanService.confirmOrderPayment(orderNumber, transactionRef).subscribe({
-            next: (res) => {
-              this.isProcessingPayment = false;
-              this.paymentSuccess = true;
-              this.paymentResultMessage = res.message || 'Payment confirmed successfully';
-              this.modalService.open(this.paymentResultModal, { centered: true, backdrop: 'static' });
-              this.loadLoanDetails();
-            },
-            error: (err) => {
-              this.isProcessingPayment = false;
-              this.paymentSuccess = false;
-              this.paymentResultMessage = err?.error?.message || 'Payment was received but confirmation failed. Please contact support.';
-              this.modalService.open(this.paymentResultModal, { centered: true, backdrop: 'static' });
-            }
-          });
-        } else {
-          this.toastr.error('Payment was not completed. Please try again.');
+        if (!response?.data?.success && !response?.success) {
+          this.toastr.error(response?.data?.message || 'Failed to initiate payment.');
+          return;
         }
+
+        const paymentData = response.data;
+
+        // Step 2: Show Interswitch Payment UI with data from backend
+        this.paymentService.initiatePayment({
+          amount: paymentData.amount,
+          reference: paymentData.paymentReference,
+          merchantCode: this.loan!.merchantCode,
+          payItemId: this.loan!.payableCode,
+          customerEmail: paymentData.customerEmail,
+          customerPhone: paymentData.customerPhone,
+          customerName: paymentData.customerName,
+          onComplete: (paymentResponse) => {
+            console.log('Payment response:', paymentResponse);
+            if (paymentResponse && paymentResponse.txnref) {
+              this.isProcessingPayment = true;
+              const transactionRef = paymentResponse.txnref;
+              this.loanService.confirmOrderPayment(orderNumber.toString(), transactionRef).subscribe({
+                next: (res) => {
+                  this.isProcessingPayment = false;
+                  this.paymentSuccess = true;
+                  this.paymentResultMessage = res.message || 'Payment confirmed successfully';
+                  this.modalService.open(this.paymentResultModal, { centered: true, backdrop: 'static' });
+                  this.loadLoanDetails();
+                },
+                error: (err) => {
+                  this.isProcessingPayment = false;
+                  this.paymentSuccess = false;
+                  this.paymentResultMessage = err?.error?.message || 'Payment was received but confirmation failed. Please contact support.';
+                  this.modalService.open(this.paymentResultModal, { centered: true, backdrop: 'static' });
+                }
+              });
+            } else {
+              this.toastr.error('Payment was not completed. Please try again.');
+            }
+          },
+          onClose: () => {
+            console.log('Payment window was closed');
+          }
+        }).catch(error => {
+          console.error('Payment error:', error);
+          this.toastr.error('Failed to initialize payment. Please try again.');
+        });
       },
-      onClose: () => {
-        console.log('Payment window was closed');
+      error: (error) => {
+        this.isProcessingPayment = false;
+        console.error('Failed to initiate payment:', error);
+        this.toastr.error(error?.error?.message || 'Failed to initiate payment. Please try again.');
       }
-    }).catch(error => {
-      console.error('Payment error:', error);
-      this.toastr.error('Failed to initialize payment. Please try again.');
+    });
+  }
+
+  openRepaymentModal(): void {
+    this.repaymentAmount = null;
+    this.repaymentResultMessage = '';
+    this.repaymentSuccess = false;
+    this.modalService.open(this.repaymentModal, { centered: true, backdrop: 'static' });
+  }
+
+  makeRepayment(modal: any): void {
+    if (!this.loan?.order?.orderNumber || !this.repaymentAmount || this.repaymentAmount <= 0) {
+      this.toastr.error('Please enter a valid repayment amount.');
+      return;
+    }
+
+    this.isProcessingRepayment = true;
+    this.loanService.repayLoan(this.loan.order.orderNumber, this.repaymentAmount).subscribe({
+      next: (res) => {
+        this.isProcessingRepayment = false;
+        this.repaymentSuccess = true;
+        this.repaymentResultMessage = res.data?.message || 'Repayment processed successfully';
+        modal.close();
+        this.modalService.open(this.repaymentModal, { centered: true, backdrop: 'static' });
+        this.loadLoanDetails();
+      },
+      error: (err) => {
+        this.isProcessingRepayment = false;
+        this.toastr.error(err?.error?.message || 'Repayment failed. Please try again.');
+      }
     });
   }
 
   goBack(): void {
     this.router.navigate(['/loans']);
+  }
+
+  getTotalInterest(): number {
+    if (!this.loan?.schedules) return 0;
+    return this.loan.schedules.reduce((sum, item) => sum + item.interest, 0);
+  }
+
+  getTotalRepayment(): number {
+    if (!this.loan?.schedules) return 0;
+    return this.loan.schedules.reduce((sum, item) => sum + item.totalPayment, 0);
+  }
+
+  getMonthlyPayment(): number {
+    if (!this.loan?.schedules || this.loan.schedules.length === 0) return 0;
+    return this.loan.schedules[0].totalPayment;
+  }
+
+  get sortedSchedules(): LoanSchedule[] {
+    if (!this.loan?.schedules) return [];
+    return [...this.loan.schedules].sort((a, b) =>
+      new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
+    );
+  }
+
+  getScheduleStatusBadgeClass(status: string): string {
+    switch (status) {
+      case 'PAID': return 'badge-success';
+      case 'PARTLY_PAID': return 'badge-info';
+      case 'NOT_PAID': return 'badge-danger';
+      default: return 'badge-secondary';
+    }
   }
 }

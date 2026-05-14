@@ -1,0 +1,628 @@
+<!-- Loading -->
+<div *ngIf="isLoading" class="header bg-gradient-info pb-8 pt-5 pt-md-8">
+  <div class="container-fluid text-center py-5">
+    <div class="spinner-border text-white" style="width:3rem;height:3rem;" role="status"></div>
+    <p class="text-white mt-3 mb-0">Loading dashboard...</p>
+  </div>
+</div>
+
+<!-- Error -->
+<div *ngIf="!isLoading && error" class="header bg-gradient-info pb-8 pt-5 pt-md-8">
+  <div class="container-fluid pt-4">
+    <div class="alert alert-danger">{{ error }}</div>
+  </div>
+</div>
+
+<ng-container *ngIf="!isLoading && !error && data">
+
+  <!-- ── Header + Primary Summary Cards ─────────────────────────────────── -->
+  <div class="header bg-gradient-info pb-8 pt-5 pt-md-8">
+    <div class="container-fluid">
+      <div class="header-body">
+        <div class="row align-items-center mb-4">
+          <div class="col">
+            <h6 class="h2 text-white d-inline-block mb-0">Super Admin Dashboard</h6>
+            <p class="text-white opacity-8 mb-0 mt-1">Platform-wide overview</p>
+          </div>
+        </div>
+
+        <div class="row">
+          <!-- Total Orders -->
+          <div class="col-xl-3 col-lg-6 mb-4 mb-xl-0">
+            <div class="card card-stats shadow">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col">
+                    <h5 class="card-title text-uppercase text-muted mb-0">Total Orders</h5>
+                    <span class="h2 font-weight-bold mb-0">{{ data.summary.totalOrders | number }}</span>
+                  </div>
+                  <div class="col-auto">
+                    <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
+                      <i class="ni ni-cart"></i>
+                    </div>
+                  </div>
+                </div>
+                <p class="mt-3 mb-0 text-muted text-sm">
+                  <span class="text-nowrap">{{ formatCurrency(data.summary.totalOrderValue) }} total value</span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Total Loans -->
+          <div class="col-xl-3 col-lg-6 mb-4 mb-xl-0">
+            <div class="card card-stats shadow">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col">
+                    <h5 class="card-title text-uppercase text-muted mb-0">Total Loans</h5>
+                    <span class="h2 font-weight-bold mb-0">{{ data.summary.totalLoans | number }}</span>
+                  </div>
+                  <div class="col-auto">
+                    <div class="icon icon-shape bg-success text-white rounded-circle shadow">
+                      <i class="ni ni-money-coins"></i>
+                    </div>
+                  </div>
+                </div>
+                <p class="mt-3 mb-0 text-muted text-sm">
+                  <span class="text-nowrap">{{ formatCurrency(data.summary.totalLoanAmount) }} total amount</span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Total Disbursed -->
+          <div class="col-xl-3 col-lg-6 mb-4 mb-xl-0">
+            <div class="card card-stats shadow">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col">
+                    <h5 class="card-title text-uppercase text-muted mb-0">Disbursed</h5>
+                    <span class="h2 font-weight-bold mb-0">{{ formatCurrency(data.summary.totalDisbursed) }}</span>
+                  </div>
+                  <div class="col-auto">
+                    <div class="icon icon-shape bg-primary text-white rounded-circle shadow">
+                      <i class="ni ni-send"></i>
+                    </div>
+                  </div>
+                </div>
+                <p class="mt-3 mb-0 text-muted text-sm">
+                  <span class="text-success mr-1">{{ formatCurrency(data.summary.totalRepaid) }}</span>
+                  <span class="text-nowrap">repaid</span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pending Approvals -->
+          <div class="col-xl-3 col-lg-6">
+            <div class="card card-stats shadow">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col">
+                    <h5 class="card-title text-uppercase text-muted mb-0">Pending Approvals</h5>
+                    <span class="h2 font-weight-bold mb-0">{{ data.summary.pendingApprovals }}</span>
+                  </div>
+                  <div class="col-auto">
+                    <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
+                      <i class="ni ni-bell-55"></i>
+                    </div>
+                  </div>
+                </div>
+                <p class="mt-3 mb-0 text-muted text-sm">
+                  <span class="text-nowrap">{{ data.summary.activeStaff | number }} active staff</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-fluid mt--7">
+
+    <!-- ── MoM Comparison ────────────────────────────────────────────────── -->
+    <div class="row mb-4">
+      <div class="col-xl-4 mb-4">
+        <div class="card shadow">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col">
+                <h5 class="card-title text-uppercase text-muted mb-0">Order Growth</h5>
+                <span class="h2 font-weight-bold mb-0" [ngClass]="growthClass(data.comparison.orderGrowth)">
+                  {{ data.comparison.orderGrowth > 0 ? '+' : '' }}{{ data.comparison.orderGrowth | number:'1.0-2' }}%
+                </span>
+              </div>
+              <div class="col-auto">
+                <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
+                  <i [ngClass]="growthIcon(data.comparison.orderGrowth)"></i>
+                </div>
+              </div>
+            </div>
+            <p class="mt-3 mb-0 text-muted text-sm">
+              {{ data.comparison.previousMonth.month }} → {{ data.comparison.currentMonth.month }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-4 mb-4">
+        <div class="card shadow">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col">
+                <h5 class="card-title text-uppercase text-muted mb-0">Loan Growth</h5>
+                <span class="h2 font-weight-bold mb-0" [ngClass]="growthClass(data.comparison.loanGrowth)">
+                  {{ data.comparison.loanGrowth > 0 ? '+' : '' }}{{ data.comparison.loanGrowth | number:'1.0-2' }}%
+                </span>
+              </div>
+              <div class="col-auto">
+                <div class="icon icon-shape bg-success text-white rounded-circle shadow">
+                  <i [ngClass]="growthIcon(data.comparison.loanGrowth)"></i>
+                </div>
+              </div>
+            </div>
+            <p class="mt-3 mb-0 text-muted text-sm">
+              {{ data.comparison.previousMonth.month }} → {{ data.comparison.currentMonth.month }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-4 mb-4">
+        <div class="card shadow">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col">
+                <h5 class="card-title text-uppercase text-muted mb-0">Revenue Growth</h5>
+                <span class="h2 font-weight-bold mb-0" [ngClass]="growthClass(data.comparison.revenueGrowth)">
+                  {{ data.comparison.revenueGrowth > 0 ? '+' : '' }}{{ data.comparison.revenueGrowth | number:'1.0-2' }}%
+                </span>
+              </div>
+              <div class="col-auto">
+                <div class="icon icon-shape bg-primary text-white rounded-circle shadow">
+                  <i [ngClass]="growthIcon(data.comparison.revenueGrowth)"></i>
+                </div>
+              </div>
+            </div>
+            <p class="mt-3 mb-0 text-muted text-sm">
+              {{ data.comparison.previousMonth.month }} → {{ data.comparison.currentMonth.month }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Charts Row ─────────────────────────────────────────────────────── -->
+    <div class="row mb-4">
+      <!-- Order Trend -->
+      <div class="col-xl-8 mb-4">
+        <div class="card shadow">
+          <div class="card-header bg-transparent">
+            <div class="row align-items-center">
+              <div class="col">
+                <h6 class="text-uppercase text-muted ls-1 mb-1">6-Month Trend</h6>
+                <h2 class="mb-0">Order Volume</h2>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="chart" style="height:280px;">
+              <canvas id="sa-chart-orders" class="chart-canvas"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loan Distribution -->
+      <div class="col-xl-4 mb-4">
+        <div class="card shadow">
+          <div class="card-header bg-transparent">
+            <div class="row align-items-center">
+              <div class="col">
+                <h6 class="text-uppercase text-muted ls-1 mb-1">Breakdown</h6>
+                <h2 class="mb-0">Loan Distribution</h2>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="chart" style="height:280px;">
+              <canvas id="sa-chart-loans" class="chart-canvas"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Financials ─────────────────────────────────────────────────────── -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card shadow">
+          <div class="card-header border-0">
+            <h3 class="mb-0">Financial Summary</h3>
+          </div>
+          <div class="card-body pt-0">
+            <div class="row text-center">
+              <div class="col-md-3 border-right py-3">
+                <h5 class="text-muted text-uppercase small mb-1">Total Disbursed</h5>
+                <span class="h3 font-weight-bold text-primary">{{ formatCurrency(data.financials.totalDisbursed) }}</span>
+              </div>
+              <div class="col-md-3 border-right py-3">
+                <h5 class="text-muted text-uppercase small mb-1">Total Repaid</h5>
+                <span class="h3 font-weight-bold text-success">{{ formatCurrency(data.financials.totalRepaid) }}</span>
+              </div>
+              <div class="col-md-3 border-right py-3">
+                <h5 class="text-muted text-uppercase small mb-1">Outstanding Principal</h5>
+                <span class="h3 font-weight-bold text-warning">{{ formatCurrency(data.financials.outstandingPrincipal) }}</span>
+              </div>
+              <div class="col-md-3 py-3">
+                <h5 class="text-muted text-uppercase small mb-1">Interest Earned</h5>
+                <span class="h3 font-weight-bold text-info">{{ formatCurrency(data.financials.totalInterestEarned) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Orders / Loans / Payments Stats ───────────────────────────────── -->
+    <div class="row mb-4">
+
+      <!-- Orders -->
+      <div class="col-xl-4 mb-4">
+        <div class="card shadow h-100">
+          <div class="card-header border-0">
+            <h3 class="mb-0">Orders Breakdown</h3>
+          </div>
+          <div class="card-body pt-0">
+            <div class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted">Avg Order Value</span>
+              <strong>{{ formatCurrency(data.orders.averageOrderValue) }}</strong>
+            </div>
+            <div class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted">Delivery Rate</span>
+              <strong class="text-success">{{ data.orders.deliveryRate | number:'1.0-1' }}%</strong>
+            </div>
+            <div class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted">Financed Orders</span>
+              <strong>{{ data.orders.financedOrdersCount }}
+                <span class="text-muted small">({{ data.orders.financedOrdersPercentage | number:'1.0-1' }}%)</span>
+              </strong>
+            </div>
+            <div *ngFor="let s of data.orders.byStatus" class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted">{{ s.status | titlecase }}</span>
+              <span class="badge" [ngClass]="getOrderStatusClass(s.status)">{{ s.count }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loans -->
+      <div class="col-xl-4 mb-4">
+        <div class="card shadow h-100">
+          <div class="card-header border-0">
+            <h3 class="mb-0">Loans Breakdown</h3>
+          </div>
+          <div class="card-body pt-0">
+            <div class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted">Avg Loan Amount</span>
+              <strong>{{ formatCurrency(data.loans.averageLoanAmount) }}</strong>
+            </div>
+            <div class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted">Avg Interest Rate</span>
+              <strong>{{ data.loans.averageInterestRate | number:'1.0-2' }}%</strong>
+            </div>
+            <div class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted">Default Rate</span>
+              <strong [class.text-danger]="data.loans.defaultRate > 0">{{ data.loans.defaultRate | number:'1.0-2' }}%</strong>
+            </div>
+            <div class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted">Overdue Schedules</span>
+              <strong [class.text-danger]="data.loans.overdueSchedules > 0">{{ data.loans.overdueSchedules }}</strong>
+            </div>
+            <div *ngFor="let s of data.loans.byStatus" class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted">{{ s.status | titlecase }}</span>
+              <span class="badge" [ngClass]="getLoanStatusClass(s.status)">{{ s.count }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payments -->
+      <div class="col-xl-4 mb-4">
+        <div class="card shadow h-100">
+          <div class="card-header border-0">
+            <h3 class="mb-0">Payments Breakdown</h3>
+          </div>
+          <div class="card-body pt-0">
+            <div class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted">Total Payments</span>
+              <strong>{{ data.payments.total | number }}</strong>
+            </div>
+            <div class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted">Total Amount</span>
+              <strong>{{ formatCurrency(data.payments.totalAmount) }}</strong>
+            </div>
+            <div class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted">Success Rate</span>
+              <strong class="text-success">{{ data.payments.successRate | number:'1.0-2' }}%</strong>
+            </div>
+            <div class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted">Successful</span>
+              <span class="badge badge-success">{{ data.payments.successfulPayments | number }}</span>
+            </div>
+            <div class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted">Failed</span>
+              <span class="badge badge-danger">{{ data.payments.failedPayments }}</span>
+            </div>
+            <div class="d-flex justify-content-between py-2">
+              <span class="text-muted">Pending</span>
+              <span class="badge badge-warning">{{ data.payments.pendingPayments }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Staff + Lenders ────────────────────────────────────────────────── -->
+    <div class="row mb-4">
+
+      <!-- Staff -->
+      <div class="col-xl-6 mb-4">
+        <div class="card shadow h-100">
+          <div class="card-header border-0">
+            <h3 class="mb-0">Staff Overview</h3>
+          </div>
+          <div class="card-body pt-0">
+            <div class="row">
+              <div class="col-6">
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                  <span class="text-muted">Total</span>
+                  <strong>{{ data.staff.total | number }}</strong>
+                </div>
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                  <span class="text-muted">Active</span>
+                  <strong class="text-success">{{ data.staff.active }}</strong>
+                </div>
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                  <span class="text-muted">Suspended</span>
+                  <strong class="text-warning">{{ data.staff.suspended }}</strong>
+                </div>
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                  <span class="text-muted">Pending</span>
+                  <strong class="text-info">{{ data.staff.pending }}</strong>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                  <span class="text-muted">Resigned</span>
+                  <strong>{{ data.staff.resigned }}</strong>
+                </div>
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                  <span class="text-muted">Terminated</span>
+                  <strong class="text-danger">{{ data.staff.terminated }}</strong>
+                </div>
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                  <span class="text-muted">With Active Loans</span>
+                  <strong>{{ data.staff.withActiveLoans }}</strong>
+                </div>
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                  <span class="text-muted">New This Month</span>
+                  <strong class="text-primary">{{ data.staff.newThisMonth }}</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lenders -->
+      <div class="col-xl-6 mb-4">
+        <div class="card shadow h-100">
+          <div class="card-header border-0">
+            <h3 class="mb-0">Lender Overview</h3>
+          </div>
+          <div class="card-body pt-0">
+            <div class="row mb-3">
+              <div class="col-4 text-center border-right">
+                <h5 class="text-muted small text-uppercase">Total</h5>
+                <span class="h3 font-weight-bold">{{ data.lenders.totalLenders }}</span>
+              </div>
+              <div class="col-4 text-center border-right">
+                <h5 class="text-muted small text-uppercase">Local</h5>
+                <span class="h3 font-weight-bold text-success">{{ data.lenders.localLenders }}</span>
+              </div>
+              <div class="col-4 text-center">
+                <h5 class="text-muted small text-uppercase">External</h5>
+                <span class="h3 font-weight-bold text-info">{{ data.lenders.externalLenders }}</span>
+              </div>
+            </div>
+            <div class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted">Portfolio Value</span>
+              <strong>{{ formatCurrency(data.lenders.totalPortfolioValue) }}</strong>
+            </div>
+            <div class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted">Pending Requests</span>
+              <strong class="text-warning">{{ data.lenders.pendingRequests }}</strong>
+            </div>
+            <h6 class="text-muted text-uppercase small mt-3 mb-2">Top Lenders</h6>
+            <div *ngFor="let l of data.lenders.topLenders" class="d-flex justify-content-between align-items-center py-2 border-bottom">
+              <div>
+                <div class="font-weight-bold">{{ l.name }}</div>
+                <small class="text-muted">{{ l.loanCount }} loans · {{ l.activeLoans }} active</small>
+              </div>
+              <strong>{{ formatCurrency(l.totalDisbursed) }}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Organisations Table ────────────────────────────────────────────── -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card shadow">
+          <div class="card-header border-0">
+            <h3 class="mb-0">Organisations
+              <span class="badge badge-primary ml-2">{{ data.orgs.total }}</span>
+            </h3>
+          </div>
+          <div class="table-responsive">
+            <table class="table align-items-center table-flush">
+              <thead class="thead-light">
+                <tr>
+                  <th>Organisation</th>
+                  <th>Industry</th>
+                  <th>Staff</th>
+                  <th>Orders</th>
+                  <th>Loans</th>
+                  <th>Disbursed</th>
+                  <th>Outstanding</th>
+                  <th>Default Rate</th>
+                  <th>Overdue</th>
+                  <th>Pending</th>
+                  <th>Last Active</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let org of data.orgs.organisations">
+                  <td>
+                    <div class="font-weight-bold">{{ org.name }}</div>
+                    <small class="text-muted">{{ org.organisationId }}</small>
+                    <span *ngIf="org.isLender" class="badge badge-info ml-1 small">Lender</span>
+                  </td>
+                  <td>{{ org.industry | titlecase }}</td>
+                  <td>{{ org.activeStaff }} / {{ org.totalStaff }}</td>
+                  <td>{{ org.totalOrders }}</td>
+                  <td>{{ org.totalLoans }}</td>
+                  <td>{{ formatCurrency(org.totalDisbursed) }}</td>
+                  <td>{{ formatCurrency(org.outstandingBalance) }}</td>
+                  <td>
+                    <span [class.text-danger]="org.defaultRate > 3" [class.text-warning]="org.defaultRate > 0 && org.defaultRate <= 3">
+                      {{ org.defaultRate | number:'1.0-2' }}%
+                    </span>
+                  </td>
+                  <td>
+                    <span [class.text-danger]="org.overdueSchedules > 0">{{ org.overdueSchedules }}</span>
+                  </td>
+                  <td>
+                    <span class="badge badge-warning" *ngIf="org.pendingApprovals > 0">{{ org.pendingApprovals }}</span>
+                    <span class="text-muted" *ngIf="org.pendingApprovals === 0">—</span>
+                  </td>
+                  <td>{{ org.lastActivityAt | date:'mediumDate' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Repayments ─────────────────────────────────────────────────────── -->
+    <div class="row mb-4">
+
+      <!-- Repayment Summary -->
+      <div class="col-12 mb-4">
+        <div class="card shadow">
+          <div class="card-body">
+            <div class="row text-center">
+              <div class="col-md-3 border-right py-2">
+                <h5 class="text-muted text-uppercase small mb-1">Total Schedules</h5>
+                <span class="h3 font-weight-bold">{{ data.repayments.totalSchedules | number }}</span>
+              </div>
+              <div class="col-md-3 border-right py-2">
+                <h5 class="text-muted text-uppercase small mb-1">Paid</h5>
+                <span class="h3 font-weight-bold text-success">{{ data.repayments.paidSchedules | number }}</span>
+              </div>
+              <div class="col-md-3 border-right py-2">
+                <h5 class="text-muted text-uppercase small mb-1">Overdue</h5>
+                <span class="h3 font-weight-bold text-danger">{{ data.repayments.overdueSchedules }}</span>
+              </div>
+              <div class="col-md-3 py-2">
+                <h5 class="text-muted text-uppercase small mb-1">On-Time Rate</h5>
+                <span class="h3 font-weight-bold text-primary">{{ data.repayments.onTimePaymentRate | number:'1.0-2' }}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upcoming Due -->
+      <div class="col-xl-6 mb-4">
+        <div class="card shadow">
+          <div class="card-header border-0">
+            <h3 class="mb-0 text-warning"><i class="ni ni-time-alarm mr-2"></i>Upcoming Due</h3>
+          </div>
+          <div class="table-responsive">
+            <table class="table align-items-center table-flush">
+              <thead class="thead-light">
+                <tr>
+                  <th>Staff</th>
+                  <th>Loan ID</th>
+                  <th>Amount Due</th>
+                  <th>Due Date</th>
+                  <th>Days Left</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let s of data.repayments.upcomingDue">
+                  <td>{{ s.staffName }}</td>
+                  <td>{{ s.loanId }}</td>
+                  <td>{{ formatCurrencyFull(s.amountDue) }}</td>
+                  <td>{{ s.dueDate | date:'mediumDate' }}</td>
+                  <td>
+                    <span class="badge" [ngClass]="s.daysUntilDue <= 2 ? 'badge-danger' : 'badge-warning'">
+                      {{ s.daysUntilDue }}d
+                    </span>
+                  </td>
+                </tr>
+                <tr *ngIf="data.repayments.upcomingDue.length === 0">
+                  <td colspan="5" class="text-center text-muted py-3">No upcoming payments</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Overdue -->
+      <div class="col-xl-6 mb-4">
+        <div class="card shadow">
+          <div class="card-header border-0">
+            <h3 class="mb-0 text-danger"><i class="ni ni-bell-55 mr-2"></i>Overdue Payments
+              <span class="badge badge-danger ml-2">{{ formatCurrencyFull(data.repayments.totalOverdueAmount) }}</span>
+            </h3>
+          </div>
+          <div class="table-responsive">
+            <table class="table align-items-center table-flush">
+              <thead class="thead-light">
+                <tr>
+                  <th>Staff</th>
+                  <th>Loan ID</th>
+                  <th>Amount Due</th>
+                  <th>Due Date</th>
+                  <th>Days Overdue</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let s of data.repayments.overduePayments">
+                  <td>{{ s.staffName }}</td>
+                  <td>{{ s.loanId }}</td>
+                  <td>{{ formatCurrencyFull(s.amountDue) }}</td>
+                  <td>{{ s.dueDate | date:'mediumDate' }}</td>
+                  <td><span class="badge badge-danger">{{ s.daysOverdue }}d</span></td>
+                </tr>
+                <tr *ngIf="data.repayments.overduePayments.length === 0">
+                  <td colspan="5" class="text-center text-muted py-3">No overdue payments</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</ng-container>

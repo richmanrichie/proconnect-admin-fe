@@ -108,4 +108,14 @@ export class OrderDetailComponent implements OnInit {
   backToList(): void {
     this.router.navigate(['/orders']);
   }
+
+  getTotalInterest(): number {
+    if (!this.order?.schedulePreview) return 0;
+    return this.order.schedulePreview.reduce((sum, item) => sum + item.interest, 0);
+  }
+
+  getTotalRepayment(): number {
+    if (!this.order?.schedulePreview) return 0;
+    return this.order.schedulePreview.reduce((sum, item) => sum + item.totalPayment, 0);
+  }
 }

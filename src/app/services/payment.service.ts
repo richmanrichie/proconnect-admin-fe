@@ -17,8 +17,8 @@ export class PaymentService {
     reference: string;
     merchantCode: string;
     payItemId: string;
-    payItemName: string;
     customerEmail: string;
+    customerPhone: string;
     customerName: string;
     onComplete: (response: any) => void;
     onClose?: () => void;
@@ -40,11 +40,12 @@ export class PaymentService {
       const paymentRequest = {
         merchant_code: params.merchantCode,
         pay_item_id: params.payItemId,
-        pay_item_name: params.payItemName,
         txn_ref: params.reference,
         amount: (params.amount * 100).toString(), // Convert to kobo
         currency: this.CURRENCY_CODE,
+        cust_id: params.customerEmail,
         cust_email: params.customerEmail,
+        cust_mobile_no: params.customerPhone,
         cust_name: params.customerName,
         site_redirect_url: sanitizedRedirectUrl,
         mode: environment.production ? 'LIVE' : 'TEST',
@@ -66,7 +67,7 @@ export class PaymentService {
     }
   }
 
-  private generateReference(): string {
+  generateReference(): string {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let result = '';
     for (let i = 0; i < 12; i++) {

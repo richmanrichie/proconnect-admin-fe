@@ -1,0 +1,142 @@
+<div class="header bg-primary pb-8 pt-5 pt-md-8">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center">
+        <div class="col">
+          <h6 class="h2 text-white d-inline-block mb-0">QTB Stores</h6>
+        </div>
+        <div class="col text-right">
+          <button class="btn btn-sm btn-neutral" (click)="createStore()">
+            <i class="ni ni-fat-add"></i> Add Store
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--7">
+  <div class="row">
+    <div class="col">
+      <div class="card shadow">
+        <div class="card-header border-0">
+          <div class="row align-items-center">
+            <div class="col">
+              <h3 class="mb-0">Stores</h3>
+            </div>
+            <div class="col text-right">
+              <div class="form-inline justify-content-end">
+                <div class="form-group mr-2 mb-2 mb-sm-0">
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    placeholder="Search by name, ID, email..."
+                    [(ngModel)]="searchTerm"
+                    (ngModelChange)="onSearchChange()">
+                </div>
+                <div class="form-group">
+                  <select
+                    class="form-control form-control-sm"
+                    [(ngModel)]="statusFilter"
+                    (ngModelChange)="onStatusFilterChange()">
+                    <option value="">All Status</option>
+                    <option value="ACTIVE">Active</option>
+                    <option value="INACTIVE">Inactive</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div *ngIf="isLoading" class="text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+          <p class="mt-2 mb-0">Loading stores...</p>
+        </div>
+
+        <!-- Error State -->
+        <div *ngIf="!isLoading && error" class="alert alert-danger mx-4 mt-4">
+          {{ error }}
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!isLoading && !error && filteredStores.length === 0" class="text-center py-5">
+          <i class="ni ni-shop ni-3x text-muted"></i>
+          <h3 class="mt-3">No Stores Found</h3>
+          <p class="text-muted">Click "Add Store" to create a new QTB store.</p>
+        </div>
+
+        <!-- Stores Table -->
+        <div *ngIf="!isLoading && !error && filteredStores.length > 0" class="table-responsive">
+          <table class="table align-items-center table-flush">
+            <thead class="thead-light">
+              <tr>
+                <th scope="col">Store Name</th>
+                <th scope="col">QTB ID</th>
+                <th scope="col">Merchant Code</th>
+                <th scope="col">Email</th>
+                <th scope="col">Location</th>
+                <th scope="col">Status</th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let store of filteredStores">
+                <td>
+                  <div class="font-weight-bold">{{ store.name }}</div>
+                </td>
+                <td>{{ store.qtbId }}</td>
+                <td>
+                  <code class="small">{{ store.merchantCode }}</code>
+                </td>
+                <td>{{ store.email }}</td>
+                <td>{{ store.city }}, {{ store.state }}</td>
+                <td>
+                  <span class="badge" [ngClass]="getStatusBadgeClass(store.isActive)">
+                    {{ store.isActive ? 'Active' : 'Inactive' }}
+                  </span>
+                </td>
+                <td class="text-right">
+                  <div ngbDropdown placement="bottom-right" class="d-inline-block">
+                    <button class="btn btn-sm btn-icon-only text-light" ngbDropdownToggle>
+                      <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    <div ngbDropdownMenu class="dropdown-menu-right">
+                      <button ngbDropdownItem (click)="editStore(store)">
+                        <i class="ni ni-ruler-pencil text-info mr-2"></i> Edit
+                      </button>
+                      <button ngbDropdownItem (click)="confirmDelete(store, deleteModal)" class="text-danger">
+                        <i class="ni ni-fat-remove mr-2"></i> Delete
+                      </button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<ng-template #deleteModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Confirm Delete</h5>
+    <button type="button" class="close" (click)="modal.dismiss()">
+      <span>&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>Are you sure you want to delete the store <strong>{{ storeToDelete?.name }}</strong>?</p>
+    <p class="text-muted small">This action cannot be undone.</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
+    <button type="button" class="btn btn-danger" (click)="deleteStore(modal)">Delete</button>
+  </div>
+</ng-template>

@@ -29,6 +29,9 @@ export interface LoanSchedule {
   interest: number;
   totalPayment: number;
   balance: number;
+  amountPaid: number;
+  paymentStatus: string;
+  dueDate: string;
 }
 
 export interface OrderItem {
@@ -74,6 +77,28 @@ export interface LoanListResponse {
   status: string;
   data: Loan[];
   message?: string;
+}
+
+export interface ActiveLoan {
+  id: number;
+  amount: number;
+  interestRate: number;
+  staffName: string;
+  createdAt: string;
+  status: string;
+}
+
+export interface ActiveLoanListResponse {
+  status: string;
+  data: {
+    content: ActiveLoan[];
+    page: number;
+    size: number;
+    totalElements: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrevious: boolean;
+  };
 }
 
 export interface LoanDetailResponse {

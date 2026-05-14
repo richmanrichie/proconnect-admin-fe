@@ -1,0 +1,19 @@
+// Fix dropdown being clipped by table-responsive overflow
+.table-responsive {
+  overflow: visible;
+}
+
+.dropdown-menu {
+  z-index: 1050;
+}
+
+// Fix modal z-index issues
+::ng-deep {
+  .modal-backdrop {
+    z-index: 1040 !important;
+  }
+
+  .modal {
+    z-index: 1050 !important;
+  }
+}

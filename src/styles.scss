@@ -45,3 +45,29 @@
     box-sizing: border-box;
     z-index: 1000;
   }
+
+  // Hide sr-only text rendered by ng-bootstrap pagination
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  // NgbModal z-index fix
+  .modal-backdrop {
+    z-index: 1040 !important;
+  }
+
+  .modal {
+    z-index: 1050 !important;
+  }
+
+  .modal-dialog {
+    z-index: 1051 !important;
+  }

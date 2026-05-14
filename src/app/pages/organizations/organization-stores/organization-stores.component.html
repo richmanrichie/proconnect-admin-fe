@@ -1,0 +1,155 @@
+<div class="card shadow">
+  <div class="card-header border-0">
+    <div class="row align-items-center">
+      <div class="col">
+        <h3 class="mb-0">Assigned Stores</h3>
+      </div>
+      <div class="col text-right">
+        <button class="btn btn-sm btn-primary" (click)="openAssignModal(assignModal)">
+          <i class="ni ni-fat-add"></i> Assign Store
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="alert alert-success mx-4 mt-2">
+    {{ successMessage }}
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error" class="alert alert-danger mx-4 mt-2">
+    {{ error }}
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+    <p class="mt-2 mb-0">Loading stores...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && assignedStores.length === 0" class="text-center py-5">
+    <i class="ni ni-shop ni-3x text-muted"></i>
+    <h4 class="mt-3">No Stores Assigned</h4>
+    <p class="text-muted">Click "Assign Store" to add a QTB store to this organization.</p>
+  </div>
+
+  <!-- Stores Table -->
+  <div *ngIf="!isLoading && assignedStores.length > 0" class="table-responsive">
+    <table class="table align-items-center table-flush">
+      <thead class="thead-light">
+        <tr>
+          <th scope="col">Store Name</th>
+          <th scope="col">QTB ID</th>
+          <th scope="col">Merchant Code</th>
+          <th scope="col">Location</th>
+          <th scope="col">Status</th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let orgStore of assignedStores">
+          <td>
+            <div class="d-flex align-items-center">
+              <span class="font-weight-bold">{{ orgStore.store.name }}</span>
+              <span *ngIf="orgStore.isDefault" class="badge badge-success ml-2">Default</span>
+            </div>
+          </td>
+          <td>{{ orgStore.store.qtbId }}</td>
+          <td>
+            <code class="small">{{ orgStore.store.merchantCode }}</code>
+          </td>
+          <td>{{ orgStore.store.city }}, {{ orgStore.store.state }}</td>
+          <td>
+            <span class="badge" [ngClass]="orgStore.store.isActive ? 'badge-success' : 'badge-secondary'">
+              {{ orgStore.store.isActive ? 'Active' : 'Inactive' }}
+            </span>
+          </td>
+          <td class="text-right">
+            <div ngbDropdown placement="bottom-right" class="d-inline-block">
+              <button class="btn btn-sm btn-icon-only text-light" ngbDropdownToggle>
+                <i class="fas fa-ellipsis-v"></i>
+              </button>
+              <div ngbDropdownMenu class="dropdown-menu-right">
+                <button ngbDropdownItem *ngIf="!orgStore.isDefault" (click)="setAsDefaultStore(orgStore)">
+                  <i class="ni ni-check-bold text-success mr-2"></i> Set as Default
+                </button>
+                <button ngbDropdownItem (click)="confirmRemove(orgStore, removeModal)" class="text-danger">
+                  <i class="ni ni-fat-remove mr-2"></i> Remove
+                </button>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Assign Store Modal -->
+<ng-template #assignModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Assign Store</h5>
+    <button type="button" class="close" (click)="modal.dismiss()">
+      <span>&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div *ngIf="availableStores.length === 0" class="text-center py-4">
+      <i class="ni ni-shop ni-2x text-muted"></i>
+      <p class="mt-2 mb-0 text-muted">No available stores to assign.</p>
+    </div>
+
+    <div *ngIf="availableStores.length > 0">
+      <div class="form-group">
+        <label class="form-control-label">Select Store *</label>
+        <select class="form-control" [(ngModel)]="selectedStoreId">
+          <option [ngValue]="null" disabled>Choose a store...</option>
+          <option *ngFor="let store of availableStores" [ngValue]="store.id">
+            {{ store.name }} ({{ store.qtbId }}) - {{ store.city }}
+          </option>
+        </select>
+      </div>
+
+      <div class="custom-control custom-checkbox mt-3">
+        <input type="checkbox" class="custom-control-input" id="setAsDefault" [(ngModel)]="setAsDefault">
+        <label class="custom-control-label" for="setAsDefault">
+          Set as default store for this organization
+        </label>
+      </div>
+    </div>
+
+    <div *ngIf="error" class="alert alert-danger mt-3 mb-0">
+      {{ error }}
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
+    <button type="button" class="btn btn-primary"
+            [disabled]="!selectedStoreId || isAssigning"
+            (click)="assignStore(modal)">
+      <span *ngIf="isAssigning" class="spinner-border spinner-border-sm mr-1"></span>
+      Assign Store
+    </button>
+  </div>
+</ng-template>
+
+<!-- Remove Confirmation Modal -->
+<ng-template #removeModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Remove Store</h5>
+    <button type="button" class="close" (click)="modal.dismiss()">
+      <span>&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>Are you sure you want to remove <strong>{{ storeToRemove?.store?.name }}</strong> from this organization?</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
+    <button type="button" class="btn btn-danger" (click)="removeStore(modal)">Remove</button>
+  </div>
+</ng-template>
