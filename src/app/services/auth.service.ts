@@ -68,6 +68,18 @@ export class AuthService {
    * @param credentials User credentials (email and password)
    * @returns Observable with login result
    */
+  forgotPassword(email: string): Observable<any> {
+    return this.http.post(`${this.API_URL}/forgot-password`, null, {
+      params: { email }
+    });
+  }
+
+  resetPassword(email: string, otp: string, newPassword: string): Observable<any> {
+    return this.http.post(`${this.API_URL}/reset-password`, null, {
+      params: { email, otp, newPassword }
+    });
+  }
+
   login(credentials: {email: string, password: string}): Observable<boolean> {
     return this.http.post<{message: string, token: string, isFirstLogin?: boolean}>
       (`${this.API_URL}/login`, credentials)

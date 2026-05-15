@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  apiBaseUrl: '/api/v1',
+  apiBaseUrl: 'https://proconnect-lingering-rain-3381.fly.dev/api/v1',
   merchantCode: 'MX007',
   payItemId: '101007',
   payment: {

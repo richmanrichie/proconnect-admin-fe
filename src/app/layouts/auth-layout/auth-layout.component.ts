@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-auth-layout',
@@ -9,6 +10,7 @@ import { Router } from '@angular/router';
 export class AuthLayoutComponent implements OnInit, OnDestroy {
   test: Date = new Date();
   public isCollapsed = true;
+  public hideNavbar = false;
 
   constructor(private router: Router) { }
 
@@ -17,10 +19,12 @@ export class AuthLayoutComponent implements OnInit, OnDestroy {
     html.classList.add("auth-layout");
     var body = document.getElementsByTagName("body")[0];
     body.classList.add("bg-default");
-    this.router.events.subscribe((event) => {
+    this.router.events.pipe(filter(event => event instanceof NavigationEnd)).subscribe((event: NavigationEnd) => {
       this.isCollapsed = true;
-   });
-
+      this.hideNavbar = event.url.includes('/forgot-password');
+    });
+    // Set initial state
+    this.hideNavbar = this.router.url.includes('/forgot-password');
   }
   ngOnDestroy() {
     var html = document.getElementsByTagName("html")[0];

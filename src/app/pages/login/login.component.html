@@ -68,8 +68,8 @@
             </div>
             
             <div class="text-center">
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 class="btn btn-primary my-4"
                 [disabled]="loading">
                 <span *ngIf="loading" class="spinner-border spinner-border-sm mr-2"></span>
@@ -77,6 +77,9 @@
               </button>
             </div>
           </form>
+          <div class="text-center">
+            <a routerLink="/auth/forgot-password" class="text-muted small">Forgot password?</a>
+          </div>
         </div>
       </div>
       
